@@ -111,11 +111,6 @@ param.S_MV = nlobj.MV(1).Max - nlobj.MV(1).Min; % scale factor for MV adjustment
 param.S_MV_rate = 1;                            % scale factor used for rate of MV adjustment (2023-11-13)
 param.MV_ref = 0; % reference for MV tracking penalty (2023-11-13)
 
-%% load state scaling structure for cost calculation
-filename_state_scaling_structure = 'C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\00-Minimum phase region\P_+_state_scaling_data.mat'; % state scaling
-load(filename_state_scaling_structure); % load state scaling data
-param.PS_input = PS_input;
-
 %%
 nlobj.Optimization.CustomCostFcn = @(X,U,e,data,params) CostFunction_for_two_states(X,U,e,data,params); % (2023-10-28)
 nlobj.Optimization.ReplaceStandardCost = true;
@@ -273,9 +268,9 @@ NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
 NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-% save data
-filename = '/scratch3/20068530/NLMPC_Outputs.mat';
-save(filename,'tauc_changed_batch_3_phi3_min06',"-v7.3");
+% % save data
+% filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+% save(filename,'tauc_changed_batch_3_phi3_min06',"-v7.3");
 
 % %% plots
 % subplot(2,1,1)
