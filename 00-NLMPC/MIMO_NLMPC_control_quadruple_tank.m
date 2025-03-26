@@ -2,7 +2,7 @@
 %% using NMPC.
 %% Date: 2023-12-04
 %% Name: Edward Bras
-clc;clear;
+clc;clearvars -except ans;
 rng(1)
 
 tic 
@@ -268,26 +268,35 @@ u_Reconstruct_CL_trajectory(1,:) = [];
 SP_Reconstruct_trajectory(1,:) = [];
 Cost_trajectory(1) = [];
 
-%% plots
-subplot(2,1,1)
-plot(x_Reconstruct_CL_trajectory(:,1),'b-','LineWidth',2); hold on; 
-plot(x_Reconstruct_CL_trajectory(:,2),'k:','LineWidth',2);
-plot(x_Reconstruct_CL_trajectory(:,3),'m-','LineWidth',2);
-plot(x_Reconstruct_CL_trajectory(:,4),'r-','LineWidth',2);
+NLMPC_Outputs.x_CL_SIMoutput_trajectory = x_Reconstruct_CL_trajectory;
+NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
+NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
+NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-plot(SP_Reconstruct_trajectory(:,1),'b--','LineWidth',2);
-plot(SP_Reconstruct_trajectory(:,2),'k--','LineWidth',2);
-xlabel('Time (s)'); ylabel('H (cm)'); axis tight;
-set(gca,'fontsize',25); legend('H_1 (cm)','H_2 (cm)','H_3 (cm)','H_4 (cm)','SP_1 (cm)','SP_2 (cm)');
+% save data
+filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+save(filename,'tauc_changed_batch_3_phi3_min06',"-v7.3");
 
-subplot(2,1,2)
-plot(u_Reconstruct_CL_trajectory(:,1),'k-','LineWidth',2); hold on;
-plot(u_Reconstruct_CL_trajectory(:,2),'k--','LineWidth',2);
-xlabel('Time (s)'); ylabel('u (-)'); axis tight;
-legend('u_1 (V)','u_2 (V)');
-set(gca,'fontsize',25); 
-
-set(gcf,'Color','white');
+% %% plots
+% subplot(2,1,1)
+% plot(x_Reconstruct_CL_trajectory(:,1),'b-','LineWidth',2); hold on; 
+% plot(x_Reconstruct_CL_trajectory(:,2),'k:','LineWidth',2);
+% plot(x_Reconstruct_CL_trajectory(:,3),'m-','LineWidth',2);
+% plot(x_Reconstruct_CL_trajectory(:,4),'r-','LineWidth',2);
+% 
+% plot(SP_Reconstruct_trajectory(:,1),'b--','LineWidth',2);
+% plot(SP_Reconstruct_trajectory(:,2),'k--','LineWidth',2);
+% xlabel('Time (s)'); ylabel('H (cm)'); axis tight;
+% set(gca,'fontsize',25); legend('H_1 (cm)','H_2 (cm)','H_3 (cm)','H_4 (cm)','SP_1 (cm)','SP_2 (cm)');
+% 
+% subplot(2,1,2)
+% plot(u_Reconstruct_CL_trajectory(:,1),'k-','LineWidth',2); hold on;
+% plot(u_Reconstruct_CL_trajectory(:,2),'k--','LineWidth',2);
+% xlabel('Time (s)'); ylabel('u (-)'); axis tight;
+% legend('u_1 (V)','u_2 (V)');
+% set(gca,'fontsize',25); 
+% 
+% set(gcf,'Color','white');
 
 toc
 
