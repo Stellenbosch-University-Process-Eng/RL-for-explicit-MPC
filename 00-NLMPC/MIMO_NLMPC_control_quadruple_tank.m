@@ -16,12 +16,12 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1; % set the sample time within the MPC object
-nlobj.PredictionHorizon = 300;           % prediction horizon
-nlobj.ControlHorizon = 2;%5;               % number of steps to adjust across the horizon
+nlobj.PredictionHorizon = 100;           % prediction horizon
+nlobj.ControlHorizon = 10;               % number of steps to adjust across the horizon
 
 %% set decay rate for valve positions
-param.gamma1 = 0.43;%0.95;%0.7;     % valve position 1
-param.gamma2 = 0.34;%0.95;%0.6;     % valve position 2
+param.gamma1 = 0.02;     % valve position 1
+param.gamma2 = 0.02;     % valve position 2
 
 %% define parameters for model
 param.A1 = 28; % cross-sectional area (cm^2)
@@ -33,8 +33,8 @@ param.a3 = param.a1;
 param.a2 = 0.057;
 param.a4 = param.a2;
 param.g = 981;   % gravitational acceleration (cm/s^2)
-param.k1 = 3.14;%3.33; % pump 1 gain (cm^3/V)
-param.k2 = 3.29;%3.35; % pump 2 gain (cm^3/V)
+param.k1 = 3.33; % pump 1 gain (cm^3/V)
+param.k2 = 3.35; % pump 2 gain (cm^3/V)
 param.observedGamma1 = param.gamma1; %param.initial_gammas; % fraction valve 1 opening "seen" by the MPC (2023-12-04)
 param.observedGamma2 = param.gamma2; %param.initial_gammas; % fraction valve 2 opening "seen" by the MPC (2023-12-04)
 
@@ -132,8 +132,8 @@ nlobj.Optimization.SolverOptions.OptimalityTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.FunctionTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.MaxIterations = 40;
 
-% %% specify Jacobian for cost function
-% nlobj.Jacobian.CustomCostFcn = @(X,U,e,data,params) myCostJacobian(X,U,e,data,params);
+%% specify Jacobian for cost function
+nlobj.Jacobian.CustomCostFcn = @(X,U,e,data,params) myCostJacobian(X,U,e,data,params);
 
 %% validate the prediction model's functions
 validateFcns(nlobj,x0,u0,[],{param}); % validate -> nlobj = object, x0 = starting states, u0 = control inputs, [] = no measured disturbances, Ts = an optional parameter
@@ -155,12 +155,12 @@ Cost_trajectory = 0; % initialize variable for the storing of reward trajectory 
 % SP 1
 spSample.setPoint_low = 10; 
 spSample.setPoint_high = 20; 
-spSample.nmberTimes = 3;%2;%5;
+spSample.nmberTimes = 3;
 
 % SP 2
 spSample.setPoint_low_2 = 10;  
 spSample.setPoint_high_2 = 20; 
-spSample.nmberTimes_2 = 3;%2;%5;
+spSample.nmberTimes_2 = 3;
 
 % sample SPs
 spSample.sampleTimes = randi([1,simulationTime],1,spSample.nmberTimes);
@@ -293,61 +293,12 @@ toc
 
 %% functions
 % cost function for two-dimensional states (2023-10-21)
-% function J = CostFunction_for_two_states(X,U,e,data,params)
-%     N = data.PredictionHorizon;
-% %     X_1 = X(2:N+1,1); % state 1
-% %     X_2 = X(2:N+1,2); % state 2
-% 
-% 
-%     Refs_1 = data.References(1:N,1);
-%     Refs_2 = data.References(1:N,2);
-% 
-%     XX = [Refs_1,Refs_2,X(2:N+1,:)]; % full state in a matrix
-% 
-%     XXs = mapminmax('apply',XX',params.PS_input); % scale states
-%     XXs = XXs'; % transpose
-% 
-%     SP_1_s = XXs(:,1); % SP1 scaled
-%     SP_2_s = XXs(:,2); % SP2 scaled
-%     X_1_s = XXs(:,3); % H1 scaled   
-%     X_2_s = XXs(:,4); % H2 scaled
-% 
-%     U_1 = U(1:N,1); % control input 1 (2023-11-13)
-%     U_2 = U(1:N,2); % control input 2 (2023-11-13)
-% 
-%     U_1_shifted = U(2:N+1,1); % shifted control input 1 (2023-11-13)
-%     U_2_shifted = U(2:N+1,2); % shifted control input 2 (2023-11-13)
-%     
-%     Refs_U_1 = params.MV_ref*ones(size(Refs_1)); % reference values for control input 1 (2023-11-10)
-%     Refs_U_2 = params.MV_ref*ones(size(Refs_2)); % reference values for control input 2 (2023-11-10)
-% 
-%     SP_tracking_cost = params.Q(1)*(X_1_s - SP_1_s).^2 + ...
-%         ( ( params.Q(2)+params.Q(3) ) ).*(X_1_s - SP_1_s).*(X_2_s - SP_2_s) +...
-%         params.Q(4)*(X_2_s - SP_2_s).^2;
-% 
-%     MV_tracking_cost = ( params.R(1)/params.S_MV )*(U_1 - Refs_U_1).^2 + ...
-%         ( ( params.R(2) + params.R(3) )/params.S_MV ).*(U_1-Refs_U_1).*(U_2 - Refs_U_2) +...
-%         ( params.R(4)/params.S_MV )*(U_2-Refs_U_2).^2;
-% 
-%     MV_rate_cost = ( params.MVr(1)/params.S_MV_rate )*(U_1_shifted - U_1).^2 + ...
-%         ( ( params.MVr(2) + params.MVr(3) )/params.S_MV_rate ).*(U_1_shifted - U_1).*(U_2_shifted - U_2) +...
-%         ( params.MVr(4)/params.S_MV_rate )*(U_2_shifted - U_2).^2;
-% 
-%     J = sum(  SP_tracking_cost + MV_tracking_cost + MV_rate_cost ) ... 
-%         + e;
-% 
-% end
-
-% cost function for two-dimensional states (2023-10-21)
 function J = CostFunction_for_two_states(X,U,e,data,params)
     N = data.PredictionHorizon;
     X_1 = X(2:N+1,1); % state 1
     X_2 = X(2:N+1,2); % state 2
     Refs_1 = data.References(1:N,1);
     Refs_2 = data.References(1:N,2);
-
-%     U_1 = U(2:N+1,1); % control input 1 (2023-11-10)
-%     U_2 = U(2:N+1,2); % control input 2 (2023-11-10)
 
     U_1 = U(1:N,1); % control input 1 (2023-11-13)
     U_2 = U(1:N,2); % control input 2 (2023-11-13)
