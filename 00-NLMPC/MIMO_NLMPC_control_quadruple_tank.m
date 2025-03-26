@@ -127,8 +127,8 @@ nlobj.Optimization.SolverOptions.OptimalityTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.FunctionTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.MaxIterations = 40;
 
-%% specify Jacobian for cost function
-nlobj.Jacobian.CustomCostFcn = @(X,U,e,data,params) myCostJacobian(X,U,e,data,params);
+% %% specify Jacobian for cost function
+% nlobj.Jacobian.CustomCostFcn = @(X,U,e,data,params) myCostJacobian(X,U,e,data,params);
 
 %% validate the prediction model's functions
 validateFcns(nlobj,x0,u0,[],{param}); % validate -> nlobj = object, x0 = starting states, u0 = control inputs, [] = no measured disturbances, Ts = an optional parameter
