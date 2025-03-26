@@ -17,11 +17,11 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 %% specifying controller parameters
 nlobj.Ts = 1; % set the sample time within the MPC object
 nlobj.PredictionHorizon = 100;           % prediction horizon
-nlobj.ControlHorizon = 10;               % number of steps to adjust across the horizon
+nlobj.ControlHorizon = 3;               % number of steps to adjust across the horizon
 
 %% set valve positions
-param.gamma1 = 0.02;     % valve position 1
-param.gamma2 = 0.02;     % valve position 2
+param.gamma1 = 0.3;     % valve position 1
+param.gamma2 = 0.3;     % valve position 2
 
 %% define parameters for model
 param.A1 = 28; % cross-sectional area (cm^2)

@@ -17,8 +17,8 @@ param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
 param.k1 = 3.33;     % pump 1 gain (cm^3/V)
 param.k2 = 3.35;     % pump 2 gain (cm^3/V)
-param.gamma1 = @(t) 0.02 + 0*t; % fraction opening pump 1 three-way valve (-)
-param.gamma2 = @(t) 0.02 + 0*t; % fraction opening pump 2 three-way valve (-)
+param.gamma1 = @(t) 0.3 + 0*t; % fraction opening pump 1 three-way valve (-)
+param.gamma2 = @(t) 0.3 + 0*t; % fraction opening pump 2 three-way valve (-)
 
 %% specify initial state, SP, and prediction model inputs
 v_1_SS = @(t) 3 + 0*t; % pump 1 voltage (V)
