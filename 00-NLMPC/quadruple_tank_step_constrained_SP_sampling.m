@@ -1,11 +1,10 @@
-function spSample = step_constrained_SP_sampling(spSample)
+function spSample = quadruple_tank_step_constrained_SP_sampling(spSample,SP_SS,SP_index)
     
     % Initialize the set points array
     spSample.SP_samples = zeros(1, spSample.nmberTimes); % Preallocate for efficiency
     
-    % Generate the first set point in the middle of the given bounds
-    spSample.SP_samples(1) = spSample.setPoint_low + ...
-        (spSample.setPoint_high - spSample.setPoint_low)/2;
+    % Generate the first set point
+    spSample.SP_samples(1) = SP_SS(SP_index);
     
     % Generate subsequent set points with step size limit
     for i = 2:spSample.nmberTimes

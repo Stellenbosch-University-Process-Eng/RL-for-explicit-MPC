@@ -163,11 +163,11 @@ spSample_2.stepLim = 1; % step size constraint incorporated on 2024-12-04
 
 % sample SPs
 spSample.sampleTimes = randi([1,simulationTime],1,spSample.nmberTimes);
-spSample = step_constrained_SP_sampling(spSample);
+spSample = quadruple_tank_step_constrained_SP_sampling(spSample,SP,1);
 
 % sample SP 2 (2023-11-26)
 spSample_2.sampleTimes = randi([1,simulationTime],1,spSample_2.nmberTimes);
-spSample_2 = step_constrained_SP_sampling(spSample_2);
+spSample_2 = quadruple_tank_step_constrained_SP_sampling(spSample_2,SP,2);
 
 %% number of entries in tspan vector
 nmberTspanEntries = 100;
