@@ -19,7 +19,7 @@ nlobj.Ts = 1; % set the sample time within the MPC object
 nlobj.PredictionHorizon = 100;           % prediction horizon
 nlobj.ControlHorizon = 10;               % number of steps to adjust across the horizon
 
-%% set decay rate for valve positions
+%% set valve positions
 param.gamma1 = 0.02;     % valve position 1
 param.gamma2 = 0.02;     % valve position 2
 
@@ -35,8 +35,8 @@ param.a4 = param.a2;
 param.g = 981;   % gravitational acceleration (cm/s^2)
 param.k1 = 3.33; % pump 1 gain (cm^3/V)
 param.k2 = 3.35; % pump 2 gain (cm^3/V)
-param.observedGamma1 = param.gamma1; %param.initial_gammas; % fraction valve 1 opening "seen" by the MPC (2023-12-04)
-param.observedGamma2 = param.gamma2; %param.initial_gammas; % fraction valve 2 opening "seen" by the MPC (2023-12-04)
+param.observedGamma1 = param.gamma1;  % fraction valve 1 opening "seen" by the MPC (2023-12-04)
+param.observedGamma2 = param.gamma2;  % fraction valve 2 opening "seen" by the MPC (2023-12-04)
 
 %% specifying dynamic model
 nlobj.Model.StateFcn = @(x,u,p) myStateFunction(x,u,param);  % specify model used to generate next states
@@ -46,26 +46,26 @@ nlobj.Model.NumberOfParameters = 1; % set the number of optional parameters equa
 nlobj.Jacobian.StateFcn = @(x,u,p) myStateJacobian(x,u,param); % specify Jacobian for the predictive model
 
 %% specify initial state, SP, and prediction model inputs
-v_1_SS = 3.15; %-(3-miniumSetting)*(t>3000); % pump voltage (V)
-v_2_SS = 3.15; %-(3-miniumSetting)*(t>3000);
+v_1_SS = 3.15; % pump voltage (V)
+v_2_SS = 3.15; 
 h_1_SS_initial_guess = 10.18; % liquid height (cm)
 h_2_SS_initial_guess = 15.70;
 h_3_SS_initial_guess = 6.05;
 h_4_SS_initial_guess = 9.28;
 
-%% simulate the non-linear process model
+%% find model steady states
 final_time = 1e6;
 tspan = linspace(0,final_time,final_time); % time span (s)
 [~,Output] = ode23s(@(t,x) QTProcess_NL_const_time(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);
 
-%% save steady states
+% extract steady states from simulation output
 h_1_SS = Output(end,1);
 h_2_SS = Output(end,2);
 h_3_SS = Output(end,3);
 h_4_SS = Output(end,4);
 
 x0 = [h_1_SS,h_2_SS,h_3_SS,h_4_SS]'; % nominal states
-u0 = [3,3]'; % nominal inputs to the model
+u0 = [v_1_SS,v_2_SS]'; % nominal inputs to the model
 SP = [h_1_SS,h_2_SS,0,0]; % set point
 
 %% linear constraints on the MVs
@@ -74,7 +74,7 @@ for cntr = 1:1:nu
     nlobj.MV(cntr).Max = 30;
 end
 
-nlobj.ManipulatedVariables(1).MaxECR = 0;
+nlobj.ManipulatedVariables(1).MaxECR = 0; % constraints on MV are hard constraints
 
 % %% set constraints on the measured output
 % for cntr = 1:1:nx
@@ -90,7 +90,7 @@ param.MVr = [0,0;0,0];%[0.01,0;0,0.01]; % weighting matrix for rate of control i
 %% https://www.mathworks.com/help/mpc/ug/specify-cost-function-for-nonlinear-mpc.html
 data.Ts = nlobj.Ts; % sampling period
 data.CurrentStates = x0; % current states
-data.LastMV = u0(1); % last control input
+data.LastMV = u0;     % last control input
 data.References = SP; % set point
 data.MVTarget = []; 
 data.PredictionHorizon = nlobj.PredictionHorizon;
@@ -106,12 +106,14 @@ e = 0;       % only hard constraints are applicable
 % information and tips on constraint softening and the tuning of Equal
 % Concern for Relaxation (ECR) values.
 
-param.S_tracking = 1;%nlobj.States(1).Max - nlobj.States(1).Min; % scale factor for SP tracking cost (2023-11-13)
+% also see https://www.mathworks.com/help/mpc/ug/optimization-problem.html
+
+param.S_tracking = 1;                           % scale factor for SP tracking cost (2023-11-13)
 param.S_MV = nlobj.MV(1).Max - nlobj.MV(1).Min; % scale factor for MV adjustment (2023-11-13)
 param.S_MV_rate = 1;                            % scale factor used for rate of MV adjustment (2023-11-13)
 param.MV_ref = 0; % reference for MV tracking penalty (2023-11-13)
 
-%%
+%% https://www.mathworks.com/help/optim/ug/tolerances-and-stopping-criteria.html
 nlobj.Optimization.CustomCostFcn = @(X,U,e,data,params) CostFunction_for_two_states(X,U,e,data,params); % (2023-10-28)
 nlobj.Optimization.ReplaceStandardCost = true;
 
@@ -186,27 +188,11 @@ for currentTimeStamp = 1:1:(simulationTime/nlobj.Ts)
                     SP(1) = spSample.SP_samples(i);
                 end
 
-                % determine the SP at the next time step (next state 3)
-                % (2024-02-12)
-                if spSample.sampleTimes(i) == currentTimeStamp + 1
-                    SP_nxt(1) = spSample.SP_samples(i); % assign next SP as the next state 3 (2023-06-04)
-                else
-                    SP_nxt(1) = SP(1); % updated 2023-06-04
-                end
-
             end
             % sample H2 SP (2023-11-17)
             for j = 1:1:size(spSample_2.sampleTimes,2)
                 if spSample_2.sampleTimes(j) == currentTimeStamp
                     SP(2) = spSample_2.SP_samples(j); % (2023-11-17)
-                end
-
-                % determine the SP at the next time step (next state 3)
-                % (2024-02-12)
-                if spSample_2.sampleTimes(i) == currentTimeStamp + 1
-                    SP_nxt(2) = spSample_2.SP_samples(i); % assign next SP as the next state 3 (2023-06-04)
-                else
-                    SP_nxt(2) = SP(2); % updated 2023-06-04
                 end
 
             end
@@ -227,7 +213,8 @@ for currentTimeStamp = 1:1:(simulationTime/nlobj.Ts)
     % determine vector of optimal control inputs
     [~,~,Info] = nlmpcmove(nlobj,x_k,u_k,SP,[],nloptions);
     % implement first control move from optimized trajectory
-    tspan = linspace(currentTimeStamp,currentTimeStamp + 1*nlobj.Ts,nmberTspanEntries);
+    tspan = linspace(currentTimeStamp*nlobj.Ts,(currentTimeStamp + 1)*nlobj.Ts,nmberTspanEntries);
+
     [~,Output] = ode23s(@(t,x) myQTPDEs(t,x,param,Info.MVopt(1,:)),tspan,x_k');
     x_kPlus1 = Output(end,:);
 
@@ -251,7 +238,7 @@ for cntr_Reconstruct = 1:1:simulationTime
 
     u_k = u_Reconstruct_CL_trajectory(cntr_Reconstruct+1,:);     % current control input
     SP_k = SP_Reconstruct_trajectory(cntr_Reconstruct+1,:);      % current SP
-    tspan = linspace(cntr_Reconstruct,cntr_Reconstruct+1*nlobj.Ts,nmberTspanEntries);
+    tspan = linspace(cntr_Reconstruct*nlobj.Ts,(cntr_Reconstruct+1)*nlobj.Ts,nmberTspanEntries);
     [~,Output_reconstruct] = ode45(@(t,x) myQTPDEs(t,x,param,u_k),tspan,x_k');
     x_kPlus1_Reconstruct = Output_reconstruct(end,:);
     % extend saved trajectories
@@ -270,9 +257,9 @@ NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
 NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-% save data
-filename = '/scratch3/20068530/NLMPC_Outputs.mat';
-save(filename,'NLMPC_Outputs',"-v7.3");
+% % save data
+% filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+% save(filename,'NLMPC_Outputs',"-v7.3");
 
 %% plots
 subplot(2,1,1)
