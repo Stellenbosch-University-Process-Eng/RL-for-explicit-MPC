@@ -366,18 +366,18 @@ end
 % Specify analytical Jacobian for predictive model
 function [A,Bmv] = myStateJacobian(x,u,param)
     A(1,1) = -1*( param.a1/(2*param.A1) )*sqrt(2*param.g)*x(1)^-0.5;
-    A(1,3) = ( param.a1/(2*param.A1) )*sqrt(2*param.g)*x(3)^-0.5;
+    A(1,3) = ( param.a3/(2*param.A1) )*sqrt(2*param.g)*x(3)^-0.5;
     Bmv(1,1) = param.gamma1*param.k1/param.A1;
 
     A(2,2) = -1*( param.a2/(2*param.A2) )*sqrt(2*param.g)*x(2)^-0.5;
-    A(2,4) = ( param.a2/(2*param.A2) )*sqrt(2*param.g)*x(4)^-0.5;
+    A(2,4) = ( param.a4/(2*param.A2) )*sqrt(2*param.g)*x(4)^-0.5;
     Bmv(2,2) = param.gamma2*param.k2/param.A2;
 
-    A(3,3) = -1*(param.a1/(2*param.A1))*sqrt(2*param.g)*x(3)^-0.5;
-    Bmv(3,2) = (1-param.gamma2)*param.k2/param.A1;
+    A(3,3) = -1*(param.a3/(2*param.A1))*sqrt(2*param.g)*x(3)^-0.5;
+    Bmv(3,2) = (1-param.gamma2)*param.k2/param.A3;
 
-    A(4,4) = -1*(param.a2/(2*param.A2))*sqrt(2*param.g)*x(4)^-0.5;
-    Bmv(4,1) = (1-param.gamma1)*param.k1/param.A2;
+    A(4,4) = -1*(param.a4/(2*param.A2))*sqrt(2*param.g)*x(4)^-0.5;
+    Bmv(4,1) = (1-param.gamma1)*param.k1/param.A4;
 
 end
 
