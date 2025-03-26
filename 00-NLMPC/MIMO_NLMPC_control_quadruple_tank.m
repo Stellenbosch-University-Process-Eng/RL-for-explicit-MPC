@@ -151,19 +151,21 @@ Cost_trajectory = 0; % initialize variable for the storing of reward trajectory 
 spSample.setPoint_low = 10; 
 spSample.setPoint_high = 20; 
 spSample.nmberTimes = 3;
+spSample.stepLim = 1; % step size constraint incorporated on 2024-12-04
 
 % SP 2
-spSample.setPoint_low_2 = 10;  
-spSample.setPoint_high_2 = 20; 
-spSample.nmberTimes_2 = 3;
+spSample_2.setPoint_low = 10;  
+spSample_2.setPoint_high = 20; 
+spSample_2.nmberTimes = 3;
+spSample_2.stepLim = 1; % step size constraint incorporated on 2024-12-04
 
 % sample SPs
 spSample.sampleTimes = randi([1,simulationTime],1,spSample.nmberTimes);
-spSample.SP_samples = spSample.setPoint_low + (spSample.setPoint_high - spSample.setPoint_low)*rand(1,spSample.nmberTimes);
+spSample = step_constrained_SP_sampling(spSample);
 
 % sample SP 2 (2023-11-26)
-spSample.sampleTimes_2 = randi([1,simulationTime],1,spSample.nmberTimes_2);
-spSample.SP_samples_2 = spSample.setPoint_low_2 + (spSample.setPoint_high_2 - spSample.setPoint_low_2)*rand(1,spSample.nmberTimes_2);
+spSample_2.sampleTimes = randi([1,simulationTime],1,spSample_2.nmberTimes);
+spSample_2 = step_constrained_SP_sampling(spSample_2);
 
 %% number of entries in tspan vector
 nmberTspanEntries = 100;
@@ -194,15 +196,15 @@ for currentTimeStamp = 1:1:(simulationTime/nlobj.Ts)
 
             end
             % sample H2 SP (2023-11-17)
-            for j = 1:1:size(spSample.sampleTimes_2,2)
-                if spSample.sampleTimes_2(j) == currentTimeStamp
-                    SP(2) = spSample.SP_samples_2(j); % (2023-11-17)
+            for j = 1:1:size(spSample_2.sampleTimes,2)
+                if spSample_2.sampleTimes(j) == currentTimeStamp
+                    SP(2) = spSample_2.SP_samples(j); % (2023-11-17)
                 end
 
                 % determine the SP at the next time step (next state 3)
                 % (2024-02-12)
-                if spSample.sampleTimes(i) == currentTimeStamp + 1
-                    SP_nxt(2) = spSample.SP_samples_2(i); % assign next SP as the next state 3 (2023-06-04)
+                if spSample_2.sampleTimes(i) == currentTimeStamp + 1
+                    SP_nxt(2) = spSample_2.SP_samples(i); % assign next SP as the next state 3 (2023-06-04)
                 else
                     SP_nxt(2) = SP(2); % updated 2023-06-04
                 end
@@ -268,30 +270,30 @@ NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
 NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-% % save data
-% filename = '/scratch3/20068530/NLMPC_Outputs.mat';
-% save(filename,'tauc_changed_batch_3_phi3_min06',"-v7.3");
+% save data
+filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+save(filename,'NLMPC_Outputs',"-v7.3");
 
-% %% plots
-% subplot(2,1,1)
-% plot(x_Reconstruct_CL_trajectory(:,1),'b-','LineWidth',2); hold on; 
-% plot(x_Reconstruct_CL_trajectory(:,2),'k:','LineWidth',2);
-% plot(x_Reconstruct_CL_trajectory(:,3),'m-','LineWidth',2);
-% plot(x_Reconstruct_CL_trajectory(:,4),'r-','LineWidth',2);
-% 
-% plot(SP_Reconstruct_trajectory(:,1),'b--','LineWidth',2);
-% plot(SP_Reconstruct_trajectory(:,2),'k--','LineWidth',2);
-% xlabel('Time (s)'); ylabel('H (cm)'); axis tight;
-% set(gca,'fontsize',25); legend('H_1 (cm)','H_2 (cm)','H_3 (cm)','H_4 (cm)','SP_1 (cm)','SP_2 (cm)');
-% 
-% subplot(2,1,2)
-% plot(u_Reconstruct_CL_trajectory(:,1),'k-','LineWidth',2); hold on;
-% plot(u_Reconstruct_CL_trajectory(:,2),'k--','LineWidth',2);
-% xlabel('Time (s)'); ylabel('u (-)'); axis tight;
-% legend('u_1 (V)','u_2 (V)');
-% set(gca,'fontsize',25); 
-% 
-% set(gcf,'Color','white');
+%% plots
+subplot(2,1,1)
+plot(x_Reconstruct_CL_trajectory(:,1),'b-','LineWidth',2); hold on; 
+plot(x_Reconstruct_CL_trajectory(:,2),'k:','LineWidth',2);
+plot(x_Reconstruct_CL_trajectory(:,3),'m-','LineWidth',2);
+plot(x_Reconstruct_CL_trajectory(:,4),'r-','LineWidth',2);
+
+plot(SP_Reconstruct_trajectory(:,1),'b--','LineWidth',2);
+plot(SP_Reconstruct_trajectory(:,2),'k--','LineWidth',2);
+xlabel('Time (s)'); ylabel('H (cm)'); axis tight;
+set(gca,'fontsize',25); legend('H_1 (cm)','H_2 (cm)','H_3 (cm)','H_4 (cm)','SP_1 (cm)','SP_2 (cm)');
+
+subplot(2,1,2)
+plot(u_Reconstruct_CL_trajectory(:,1),'k-','LineWidth',2); hold on;
+plot(u_Reconstruct_CL_trajectory(:,2),'k--','LineWidth',2);
+xlabel('Time (s)'); ylabel('u (-)'); axis tight;
+legend('u_1 (V)','u_2 (V)');
+set(gca,'fontsize',25); 
+
+set(gcf,'Color','white');
 
 toc
 
