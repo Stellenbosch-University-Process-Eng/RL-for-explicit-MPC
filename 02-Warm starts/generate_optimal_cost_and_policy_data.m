@@ -1,4 +1,4 @@
-%% Script used to experiment with built-in non-linear MPC functions.
+%% Script used to generate optimal policy and optimal value function data points across the state space.
 %% Date: 2023-10-04
 %% Link for MPC toolbox:  https://www.mathworks.com/help/mpc/ref/nlmpc.html
 %% Link for creating a wait bar: https://www.mathworks.com/matlabcentral/answers/400243-wait-bar-in-matlab-gui-in-nested-for-loop
@@ -7,10 +7,7 @@ rng(1)
 tic
 
 %% load matrix of coordinates (2024-02-08)
-% filename_coordinates = 'C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\00-Minimum phase region\Coded_coordinates_for_MPC_samples.mat';
-% load(filename_coordinates);
-%% load matrix of coordinates (2024-02-08)
-nmberLevels = 5;%10;%6;%2;
+nmberLevels = 5;
 nmberVariables = 6;
 myCoordMat = zeros(nmberLevels^nmberVariables,nmberVariables);
 totalCntr = 1;
@@ -262,65 +259,7 @@ end
 
 toc
 
-%% plots
-% s_SP_1 = SP_1_grid(:,:,1,1,1,1);
-% s_SP_2 = SP_2_grid(:,:,1,1,1,1);
-% s_H_1 = H_1_grid(:,:,1,1,1,1);
-% s_H_2 = H_2_grid(:,:,1,1,1,1);
-% s_H_3 = H_3_grid(:,:,1,1,1,1);
-% s_H_4 = H_4_grid(:,:,1,1,1,1);
-% 
-% s_SP_1 = permute(s_SP_1,[1,2,3,4,5,6]);
-% s_SP_2 = permute(s_SP_2,[1,2,3,4,5,6]);
-% s_H_1 = permute(s_H_1,[1,2,3,4,5,6]);
-
 %% functions
-% cost function for two-dimensional states (2023-10-21)
-% function J = CostFunction_for_two_states(X,U,e,data,params)
-%     N = data.PredictionHorizon;
-% %     X_1 = X(2:N+1,1); % state 1
-% %     X_2 = X(2:N+1,2); % state 2
-% 
-% 
-%     Refs_1 = data.References(1:N,1);
-%     Refs_2 = data.References(1:N,2);
-% 
-%     XX = [Refs_1,Refs_2,X(2:N+1,:)]; % full state in a matrix
-% 
-%     XXs = mapminmax('apply',XX',params.PS_input); % scale states
-%     XXs = XXs'; % transpose
-% 
-%     SP_1_s = XXs(:,1); % SP1 scaled
-%     SP_2_s = XXs(:,2); % SP2 scaled
-%     X_1_s = XXs(:,3); % H1 scaled   
-%     X_2_s = XXs(:,4); % H2 scaled
-% 
-%     U_1 = U(1:N,1); % control input 1 (2023-11-13)
-%     U_2 = U(1:N,2); % control input 2 (2023-11-13)
-% 
-%     U_1_shifted = U(2:N+1,1); % shifted control input 1 (2023-11-13)
-%     U_2_shifted = U(2:N+1,2); % shifted control input 2 (2023-11-13)
-%     
-%     Refs_U_1 = params.MV_ref*ones(size(Refs_1)); % reference values for control input 1 (2023-11-10)
-%     Refs_U_2 = params.MV_ref*ones(size(Refs_2)); % reference values for control input 2 (2023-11-10)
-% 
-%     SP_tracking_cost = params.Q(1)*(X_1_s - SP_1_s).^2 + ...
-%         ( ( params.Q(2)+params.Q(3) ) ).*(X_1_s - SP_1_s).*(X_2_s - SP_2_s) +...
-%         params.Q(4)*(X_2_s - SP_2_s).^2;
-% 
-%     MV_tracking_cost = ( params.R(1)/params.S_MV )*(U_1 - Refs_U_1).^2 + ...
-%         ( ( params.R(2) + params.R(3) )/params.S_MV ).*(U_1-Refs_U_1).*(U_2 - Refs_U_2) +...
-%         ( params.R(4)/params.S_MV )*(U_2-Refs_U_2).^2;
-% 
-%     MV_rate_cost = ( params.MVr(1)/params.S_MV_rate )*(U_1_shifted - U_1).^2 + ...
-%         ( ( params.MVr(2) + params.MVr(3) )/params.S_MV_rate ).*(U_1_shifted - U_1).*(U_2_shifted - U_2) +...
-%         ( params.MVr(4)/params.S_MV_rate )*(U_2_shifted - U_2).^2;
-% 
-%     J = sum(  SP_tracking_cost + MV_tracking_cost + MV_rate_cost ) ... 
-%         + e;
-% 
-% end
-
 % cost function for two-dimensional states (2023-10-21)
 function J = CostFunction_for_two_states(X,U,e,data,params)
     N = data.PredictionHorizon;
@@ -328,9 +267,6 @@ function J = CostFunction_for_two_states(X,U,e,data,params)
     X_2 = X(2:N+1,2); % state 2
     Refs_1 = data.References(1:N,1);
     Refs_2 = data.References(1:N,2);
-
-%     U_1 = U(2:N+1,1); % control input 1 (2023-11-10)
-%     U_2 = U(2:N+1,2); % control input 2 (2023-11-10)
 
     U_1 = U(1:N,1); % control input 1 (2023-11-13)
     U_2 = U(1:N,2); % control input 2 (2023-11-13)
