@@ -244,8 +244,8 @@ x_Reconstruct_CL_trajectory = x_CL_trajectory(1,:); % state initialization
 for cntr_Reconstruct = 1:1:simulationTime
     x_k(:) = x_Reconstruct_CL_trajectory(cntr_Reconstruct,:);
 
-    u_k = u_Reconstruct_CL_trajectory(cntr_Reconstruct+1,:);     % current control input
-    SP_k = SP_Reconstruct_trajectory(cntr_Reconstruct+1,:);      % current SP
+    u_k = u_Reconstruct_CL_trajectory(cntr_Reconstruct,:);     % current control input
+    SP_k = SP_Reconstruct_trajectory(cntr_Reconstruct,:);      % current SP
     tspan = linspace(cntr_Reconstruct*nlobj.Ts,(cntr_Reconstruct+1)*nlobj.Ts,nmberTspanEntries);
     [~,Output_reconstruct] = ode45(@(t,x) myQTPDEs(t,x,param,u_k),tspan,x_k');
     x_kPlus1_Reconstruct = Output_reconstruct(end,:);
@@ -255,11 +255,6 @@ for cntr_Reconstruct = 1:1:simulationTime
 end
 
 %% remove first data entries in the reconstructed trajectories (2024-02-07)
-x_Reconstruct_CL_trajectory(1,:) = [];
-u_Reconstruct_CL_trajectory(1,:) = [];
-SP_Reconstruct_trajectory(1,:) = [];
-Cost_trajectory(1) = [];
-
 NLMPC_Outputs.x_CL_SIMoutput_trajectory = x_Reconstruct_CL_trajectory;
 NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
