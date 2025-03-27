@@ -6,4 +6,5 @@ c.AdditionalProperties.Host = 'comp030';
 ncpu = 16; % number of cpu cores
 
 % submit job to the SU cluster
-test_NLMPC_qudruple_tank = batch(c,'MIMO_NLMPC_control_quadruple_tank','Pool',ncpu,'CaptureDiary',true);
+test_NLMPC_qudruple_tank = batch(c,'MIMO_NLMPC_control_quadruple_tank','Pool',ncpu,'CaptureDiary',true,...
+    'AttachedFiles',{'quadruple_tank_step_constrained_SP_sampling.m'});

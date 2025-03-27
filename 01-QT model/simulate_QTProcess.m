@@ -28,7 +28,7 @@ h_2_SS_initial_guess = 15.70;
 h_3_SS_initial_guess = 6.05;
 h_4_SS_initial_guess = 9.28;
 
-%% find model steady states
+%% find model steady state
 final_time = 1e6;
 tspan = linspace(0,final_time,final_time); % time span (s)
 [~,Output] = ode23s(@(t,x) QTProcess_NL(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);

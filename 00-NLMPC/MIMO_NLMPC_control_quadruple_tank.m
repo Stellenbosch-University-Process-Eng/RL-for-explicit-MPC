@@ -55,7 +55,7 @@ h_2_SS_initial_guess = 15.70;
 h_3_SS_initial_guess = 6.05;
 h_4_SS_initial_guess = 9.28;
 
-%% find model steady states
+%% find model steady state
 final_time = 1e6;
 tspan = linspace(0,final_time,final_time); % time span (s)
 [~,Output] = ode23s(@(t,x) QTProcess_NL_const_time(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');
@@ -260,9 +260,9 @@ NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
 NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-% % save data
-% filename = '/scratch3/20068530/NLMPC_Outputs.mat';
-% save(filename,'NLMPC_Outputs',"-v7.3");
+% save data
+filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+save(filename,'NLMPC_Outputs',"-v7.3");
 
 %% plots
 subplot(2,1,1)
