@@ -15,9 +15,9 @@ nu = 2; % measured disturbances, MV, unmeasured disturbances
 nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
-nlobj.Ts = 1; % set the sample time within the MPC object
-nlobj.PredictionHorizon = 100;           % prediction horizon
-nlobj.ControlHorizon = 3;               % number of steps to adjust across the horizon
+nlobj.Ts = 1;                   % set the sample time within the MPC object
+nlobj.PredictionHorizon = 100;  % prediction horizon
+nlobj.ControlHorizon = 3;       % number of steps to adjust across the horizon
 
 %% set valve positions
 param.gamma1 = 0.3;     % valve position 1
@@ -39,10 +39,12 @@ param.observedGamma1 = param.gamma1;  % fraction valve 1 opening "seen" by the M
 param.observedGamma2 = param.gamma2;  % fraction valve 2 opening "seen" by the MPC (2023-12-04)
 
 %% specifying dynamic model
+% https://www.mathworks.com/help/mpc/ug/specify-prediction-model-for-nonlinear-mpc.html
 nlobj.Model.StateFcn = @(x,u,p) myStateFunction(x,u,param);  % specify model used to generate next states
 nlobj.Model.NumberOfParameters = 1; % set the number of optional parameters equal to one (the parameter is the structure "p" which contains the model parameters)
 
 %% specify Jacobian for dynamic model
+% https://www.mathworks.com/help/mpc/ug/specify-prediction-model-for-nonlinear-mpc.html#mw_6eb5a593-c403-47f7-b2d8-fed832e17a61
 nlobj.Jacobian.StateFcn = @(x,u,p) myStateJacobian(x,u,param); % specify Jacobian for the predictive model
 
 %% specify initial state, SP, and prediction model inputs
@@ -56,7 +58,7 @@ h_4_SS_initial_guess = 9.28;
 %% find model steady states
 final_time = 1e6;
 tspan = linspace(0,final_time,final_time); % time span (s)
-[~,Output] = ode23s(@(t,x) QTProcess_NL_const_time(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);
+[~,Output] = ode23s(@(t,x) QTProcess_NL_const_time(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');
 
 % extract steady states from simulation output
 h_1_SS = Output(end,1);
@@ -65,12 +67,12 @@ h_3_SS = Output(end,3);
 h_4_SS = Output(end,4);
 
 x0 = [h_1_SS,h_2_SS,h_3_SS,h_4_SS]'; % nominal states
-u0 = [v_1_SS,v_2_SS]'; % nominal inputs to the model
-SP = [h_1_SS,h_2_SS,0,0]; % set point
+u0 = [v_1_SS,v_2_SS]';               % nominal inputs to the model
+SP = [h_1_SS,h_2_SS,0,0];            % set points
 
 %% linear constraints on the MVs
 for cntr = 1:1:nu
-    nlobj.MV(cntr).Min = 0.1;%0.0001; %0.2;
+    nlobj.MV(cntr).Min = 0.1;
     nlobj.MV(cntr).Max = 30;
 end
 
@@ -83,12 +85,12 @@ nlobj.ManipulatedVariables(1).MaxECR = 0; % constraints on MV are hard constrain
 % end
 
 %% specify a custom cost function
-param.Q = [1,0;0,1]; % weighting matrix for cost function (2023-10-28)
-param.R = [0,0;0,0]; % weighting matrix for control input cost (2023-11-10)
-param.MVr = [0,0;0,0];%[0.01,0;0,0.01]; % weighting matrix for rate of control input adjustments (2023-11-13)
+param.Q = [1,0;0,1];    % weighting matrix for cost function (2023-10-28)
+param.R = [0,0;0,0];    % weighting matrix for control input cost (2023-11-10)
+param.MVr = [0,0;0,0];  % weighting matrix for rate of control input adjustments (2023-11-13)
 
 %% https://www.mathworks.com/help/mpc/ug/specify-cost-function-for-nonlinear-mpc.html
-data.Ts = nlobj.Ts; % sampling period
+data.Ts = nlobj.Ts;                 % sampling period
 data.CurrentStates = x0; % current states
 data.LastMV = u0;     % last control input
 data.References = SP; % set point
@@ -107,6 +109,7 @@ e = 0;       % only hard constraints are applicable
 % Concern for Relaxation (ECR) values.
 
 % also see https://www.mathworks.com/help/mpc/ug/optimization-problem.html
+% for discussion of default MPC cost functions
 
 param.S_tracking = 1;                           % scale factor for SP tracking cost (2023-11-13)
 param.S_MV = nlobj.MV(1).Max - nlobj.MV(1).Min; % scale factor for MV adjustment (2023-11-13)
@@ -129,6 +132,8 @@ nlobj.Optimization.SolverOptions.OptimalityTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.FunctionTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.MaxIterations = 40;
 
+% For details on cost function Jacobians, see https://www.mathworks.com/help/mpc/ug/specify-cost-function-for-nonlinear-mpc.html#mw_ec61fbdc-3879-4dae-8569-b48ba271111e
+
 % %% specify Jacobian for cost function
 % nlobj.Jacobian.CustomCostFcn = @(X,U,e,data,params) myCostJacobian(X,U,e,data,params);
 
@@ -146,7 +151,10 @@ x_CL_trajectory = x0';   % initialize liquid height trajectory
 u_CL_trajectory = u0';   % initialize MV trajectory
 SP_trajectory = [SP(1),SP(2),0,0];        % initialize SP trajectory
 
-Cost_trajectory = 0; % initialize variable for the storing of reward trajectory (2023-12-04)
+% see https://www.mathworks.com/help/mpc/ref/mpc.mpcmove.html for
+% discussion on obtaining the optimal costs computed using MPC (across the
+% prediction horison)
+Cost_trajectory = 0; % initialize variable for optimal costs
 
 %% parameters used for SP sampling
 % SP 1
@@ -189,7 +197,7 @@ for currentTimeStamp = 1:1:(simulationTime/nlobj.Ts)
                 end
 
             end
-            % sample H2 SP (2023-11-17)
+            % sample H2 SP 
             for j = 1:1:size(spSample_2.sampleTimes,2)
                 if spSample_2.sampleTimes(j) == currentTimeStamp
                     SP(2) = spSample_2.SP_samples(j); % (2023-11-17)
@@ -222,7 +230,7 @@ for currentTimeStamp = 1:1:(simulationTime/nlobj.Ts)
     x_CL_trajectory = [x_CL_trajectory;x_kPlus1];
     u_CL_trajectory = [u_CL_trajectory;Info.MVopt(1,:)];
     SP_trajectory = [SP_trajectory;SP];
-    Cost_trajectory = [Cost_trajectory,-1*Info.Cost]; % expand reward trajectory (2023-12-04)
+    Cost_trajectory = [Cost_trajectory,-1*Info.Cost]; % expand record of optimal costs (summed over prediction horison)
     fprintf('\n %d \n',currentTimeStamp);
 
 end
