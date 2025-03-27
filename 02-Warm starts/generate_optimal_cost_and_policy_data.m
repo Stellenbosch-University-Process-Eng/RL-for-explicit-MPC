@@ -243,6 +243,24 @@ for cntr = 1:1:resolution4Grid^nmberRLStates
 
 end
 
+%% save relevant results in a structure
+warm_start_data.SP_1_grid = SP_1_grid;
+warm_start_data.SP_2_grid = SP_2_grid;
+warm_start_data.H_1_grid = H_1_grid;
+warm_start_data.H_2_grid = H_2_grid;
+warm_start_data.H_3_grid = H_3_grid;
+warm_start_data.H_4_grid = H_4_grid;
+
+warm_start_data.u_opt_one = u_opt_one;
+warm_start_data.u_opt_two = u_opt_two;
+warm_start_data.optimalCosts = optimalCosts;
+
+warm_start_data.model_parameters = param;
+
+% save data
+filename = '/scratch3/20068530/warm_start_data.mat';
+save(filename,'warm_start_data',"-v7.3");
+
 toc
 
 %% functions

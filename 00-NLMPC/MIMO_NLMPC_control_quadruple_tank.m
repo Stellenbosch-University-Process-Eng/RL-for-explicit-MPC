@@ -254,7 +254,7 @@ for cntr_Reconstruct = 1:1:simulationTime
     
 end
 
-%% remove first data entries in the reconstructed trajectories (2024-02-07)
+%% save relevant results in a structure
 NLMPC_Outputs.x_CL_SIMoutput_trajectory = x_Reconstruct_CL_trajectory;
 NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
