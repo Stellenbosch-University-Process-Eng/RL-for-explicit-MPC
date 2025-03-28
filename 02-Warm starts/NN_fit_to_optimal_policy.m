@@ -57,7 +57,7 @@ net.layers{2}.initFcn = 'initnw'; % specify weight initialization algorithm
 %% specify initialization method, performance function, and training algorithm
 net.initFcn = 'initlay'; % used specified layer-to-layer initialization
 net.performFcn = 'mse';
-net.trainFcn = 'trainlm'; 
+net.trainFcn = 'trainbr'; 
 
 net = configure(net,data.P_mat,data.T_mat); % configure network specifications for the data set
 
