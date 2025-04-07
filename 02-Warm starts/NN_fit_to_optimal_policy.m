@@ -46,7 +46,7 @@ data.T_mat = [data.u_optimal_one_reshaped;data.u_optimal_two_reshaped]; % create
 numHidden = 15;
 net = feedforwardnet(numHidden); % create feedforward NN
 
-net.layers{1}.transferFcn = 'poslin'; %'logsig'; % set hidden layer activation
+net.layers{1}.transferFcn = 'poslin'; % set hidden layer activation
 net.layers{2}.transferFcn = 'tansig'; % set output layer activation
 
 net.inputs{1}.processFcns = {'removeconstantrows','mapminmax'}; % specify processing functions for input one
@@ -62,7 +62,7 @@ net.trainFcn = 'trainbr';
 net = configure(net,data.P_mat,data.T_mat); % configure network specifications for the data set
 
 %% specify what training information must be displayed 
-net.plotFcns = {'plotperform','plottrainstate'}; % plot performance on 
+net.plotFcns = {'plotperform','plottrainstate'}; % plot performance in window reporting training progress
 
 %% initialize and train NN
 net = init(net);
