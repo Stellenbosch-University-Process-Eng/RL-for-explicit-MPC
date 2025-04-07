@@ -2,7 +2,9 @@
 %% linear output activation, and two output layer nodes.
 %% Name: Edward Bras
 %% Date: 2023-02-15
-function [yrnj_output,yrnj_output_NODE_TWO,z_rnj_hidden,yrnj,z_rnj_outer,z_rnj_outer_NODE_TWO] = evaluate_ReLU_tanh_six_states(NN,X,Y,Z,A,B,C)
+function [yrnj_output,yrnj_output_NODE_TWO,z_rnj_hidden,yrnj,z_rnj_outer,z_rnj_outer_NODE_TWO,div_Flag] = evaluate_ReLU_tanh_six_states(NN,X,Y,Z,A,B,C)
+    div_Flag = 0; % flag indicating whether divergence is occurring
+
     % FORWARD PASS BEGIN
     % loop through the network layers
     for r = 1:1:NN.L
@@ -23,8 +25,14 @@ function [yrnj_output,yrnj_output_NODE_TWO,z_rnj_hidden,yrnj,z_rnj_outer,z_rnj_o
         elseif z_rnj_hidden(j_hidden_fw) < 0 
             yrnj(j_hidden_fw) = 0;                         % flat section of ReLU activation
         else
-            fprintf('\n yrnj not assigned\n');
-            display(z_rnj_hidden(j_hidden_fw))
+%             fprintf('\n yrnj not assigned\n');
+%             display(z_rnj_hidden(j_hidden_fw))
+                
+            div_Flag = 1; % set flag to indicate divergence
+
+            % remove the effect of "NaN" artificially
+            z_rnj_hidden(j_hidden_fw) = 0;
+            yrnj(j_hidden_fw) = 0;
         end
         
     end % end loop through the neurons in the hidden layer
