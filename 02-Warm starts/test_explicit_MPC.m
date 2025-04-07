@@ -3,8 +3,8 @@
 %% Name: Edward Bras
 %% Date: 2023-11-24
 
-clc;clearvars -except ans;%close all;
-rng(1)%rng(2)
+clc;clearvars -except ans;
+rng(1)
 
 tic 
 
@@ -13,8 +13,8 @@ filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning
 filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_OBJ_Policy.mat";
 
 %% set decay rate for valve positions
-param.gamma1 = 0.43;%0.95; % valve 1 fraction opening
-param.gamma2 = 0.34;%0.95; % valve 2 fraction opening
+param.gamma1 = 0.43;    % valve 1 fraction opening
+param.gamma2 = 0.34;    % valve 2 fraction opening
 
 %% load warm-starting policy
 load(filename_warm_policy);
@@ -33,10 +33,9 @@ param.a1 = 0.071;   % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
 param.a2 = 0.057;
 param.a4 = param.a2;
-% param.kc = 0.50; % gain for level measurement signal (V/cm)
-param.g = 981;   % gravitational acceleration (cm/s^2)
-param.k1 = 3.14;%3.33;%2;  % pump 1 gain (cm^3/V)
-param.k2 = 3.29;%3.35;%2; % pump 2 gain (cm^3/V)
+param.g = 981;      % gravitational acceleration (cm/s^2)
+param.k1 = 3.14;    % pump 1 gain (cm^3/V)
+param.k2 = 3.29;    % pump 2 gain (cm^3/V)
 
 %% specify initial state, SP, and prediction model inputs
 v_1_SS = 3.15;
@@ -62,25 +61,25 @@ u0 = [v_1_SS,v_2_SS]'; % nominal inputs to the model
 SP = [h_1_SS,h_2_SS,0,0]; % set point
 
 %% simulate closed-loop control under non-linear MPC
-simulationTime = 50000;%10000;  % number of time steps to simulate
+simulationTime = 50000;      % number of time steps to simulate
 x_CL_trajectory = x0';       % initialize liquid height trajectory 
-u_CL_trajectory = u0';   % initialize MV trajectory
-SP_trajectory = SP;%[SP(1),SP(2),0,0];        % initialize SP trajectory
+u_CL_trajectory = u0';       % initialize MV trajectory
+SP_trajectory = SP;          % initialize SP trajectory
 
 %% set lower control input limit (2023-11-09)
-Limits.u_lower = 0.1;%0.0001; % minimum pump voltage (V)
+Limits.u_lower = 0.1;    % minimum pump voltage (V)
 Limits.u_upper = 30;     % maximum pump voltage (V)
 
 %% parameters used for SP sampling
 % SP 1
 spSample.setPoint_low = 20;
 spSample.setPoint_high = 30;
-spSample.nmberTimes = 10;%20;
+spSample.nmberTimes = 10;
 
 % SP 2
 spSample.setPoint_low_2 = 20; 
 spSample.setPoint_high_2 = 30; 
-spSample.nmberTimes_2 = 10;%20;
+spSample.nmberTimes_2 = 10;
 
 % sample SPs
 spSample.sampleTimes = randi([1,simulationTime],1,spSample.nmberTimes);
@@ -111,7 +110,6 @@ for currentTimeStamp = 1:1:(simulationTime/Ts)
             for i = 1:1:size(spSample.sampleTimes,2)
                 if spSample.sampleTimes(i) == currentTimeStamp
                     SP(1) = spSample.SP_samples(i);
-%                     SP(2) = spSample.SP_samples_2(i); % (2023-11-16)
                 end
             end
             % sample H2 SP (2023-11-17)
