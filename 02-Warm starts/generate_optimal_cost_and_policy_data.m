@@ -93,11 +93,11 @@ end
 
 nlobj.ManipulatedVariables(1).MaxECR = 0;
 
-%% set constraints on the measured output
-for cntr = 1:1:nx
-    nlobj.States(cntr).Min = 0.005;
-    nlobj.States(cntr).Max = 100;
-end
+% %% set constraints on the measured output
+% for cntr = 1:1:nx
+%     nlobj.States(cntr).Min = 0.005;
+%     nlobj.States(cntr).Max = 100;
+% end
 
 %% specify a custom cost function
 param.Q = [1,0;0,1];   % weighting matrix for cost function (2023-10-28)
@@ -196,7 +196,7 @@ nlobj.States(4).ScaleFactor = 1;
 
 [SP_1_grid,SP_2_grid,H_1_grid,H_2_grid,H_3_grid,H_4_grid] = ndgrid(SP_1_dimension,SP_2_dimension,H_1_dimension,H_2_dimension,H_3_dimension,H_4_dimension);
 
-x_k = zeros(4,1); % RL states comprise four liquid heights and two SPs (for liquid heights one and two) 
+x_k = zeros(4,1); % Internel model state.  In contrast, RL states comprise four liquid heights and two SPs (for liquid heights one and two) 
 
 %% perform optimisations using predefined matrix of indices (2024-02-08)
 nmberOpts = resolution4Grid^nmberRLStates; % number of optimizations to be solved (2023-11-16)
