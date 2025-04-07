@@ -211,7 +211,7 @@ optimalCosts = u_opt_one; % initialize vector that will be used to store optimal
 for cntr = 1:1:resolution4Grid^nmberRLStates
     row = myCoordMat(cntr,:); % obtain coordinate containing the levels of the different states
     
-    %% select SP and DV
+    %% select SPs and states
     SP(1) = SP_1_grid(row(1),row(2),row(3),row(4),row(5),row(6)); % select SP for liquid height 1
     SP(2) = SP_2_grid(row(1),row(2),row(3),row(4),row(5),row(6)); % select SP for liquid height 2
     x_k(1) = H_1_grid(row(1),row(2),row(3),row(4),row(5),row(6));
@@ -230,7 +230,7 @@ for cntr = 1:1:resolution4Grid^nmberRLStates
     [~,~,Info] = nlmpcmove(nlobj,x_k,u_k,SP,[],nloptions);  
     u_opt_one(row(1),row(2),row(3),row(4),row(5),row(6)) = Info.MVopt(1,1); % save optimal control input 1
     u_opt_two(row(1),row(2),row(3),row(4),row(5),row(6)) = Info.MVopt(1,2); % save optimal control input 2
-    optimalCosts(row(1),row(2),row(3),row(4),row(5),row(6)) = -1*Info.Cost; % save optimal cost (2024_04_25)
+    optimalCosts(row(1),row(2),row(3),row(4),row(5),row(6)) = -1*Info.Cost; % save -1*optimal cost (2024_04_25)
     
     % display error message if waitbar is closed:
 %     if ~ishghandle(H) % (2023-11-16)
@@ -342,10 +342,10 @@ function [A,Bmv] = myStateJacobian(x,u,param)
     A(2,4) = ( param.a4/(2*param.A2) )*sqrt(2*param.g)*x(4)^-0.5;
     Bmv(2,2) = param.gamma2*param.k2/param.A2;
 
-    A(3,3) = -1*(param.a3/(2*param.A1))*sqrt(2*param.g)*x(3)^-0.5;
+    A(3,3) = -1*(param.a3/(2*param.A3))*sqrt(2*param.g)*x(3)^-0.5;
     Bmv(3,2) = (1-param.gamma2)*param.k2/param.A3;
 
-    A(4,4) = -1*(param.a4/(2*param.A2))*sqrt(2*param.g)*x(4)^-0.5;
+    A(4,4) = -1*(param.a4/(2*param.A4))*sqrt(2*param.g)*x(4)^-0.5;
     Bmv(4,1) = (1-param.gamma1)*param.k1/param.A4;
 
 end
