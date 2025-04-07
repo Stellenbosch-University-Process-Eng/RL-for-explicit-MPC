@@ -166,8 +166,7 @@ for currentTimeStamp = 1:1:(simulationTime/Ts)
     
     % implement first control move from optimized trajectory
     tspan = linspace(currentTimeStamp,currentTimeStamp + 1*Ts,nmberTspanEntries);
-%     [~,Output] = ode45(@(t,x) myDEmodel(t,x,u0(2),p,Info.MVopt(1)),tspan,x_k );
-    [~,Output] = ode23s(@(t,x) myQTPDEs(t,x,param,[u_opt_1,u_opt_2]),tspan,x_k');
+    [~,Output] = ode23s(@(t,x) myQTDEs(t,x,param,[u_opt_1,u_opt_2]),tspan,x_k');
     x_kPlus1 = Output(end,:);
     % extend saved trajectories
     x_CL_trajectory = [x_CL_trajectory;x_kPlus1];
@@ -208,7 +207,7 @@ toc
 
 %% functions
 % QTP model for call to DE solver
-function dHdt = myQTPDEs(t,x,param,u)
+function dHdt = myQTDEs(t,x,param,u)
     % Function that contains the differential equations for the non-linear
     % Quadruple Tank benchmark process.
     % x(1) = h1
