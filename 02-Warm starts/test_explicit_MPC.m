@@ -9,26 +9,8 @@ rng(1)%rng(2)
 tic 
 
 %% specify path to warm-starting policy
-% filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_NN_Policy_nominal_from_draft_paper_2.mat";
-% filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_OBJ_Policy_nominal_from_draft_paper_2.mat";
-
-% filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_NN_Policy_Case_1_draft_paper_2.mat";
-% filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_OBJ_Policy_Case_1_draft_paper_2.mat";
-
-% filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_NN_Policy_Case_2_draft_paper_2.mat";
-% filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_OBJ_Policy_Case_2_draft_paper_2.mat";
-
-% filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_NN_Policy_alternative_parameter_set.mat";
-% filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_OBJ_Policy_alternative_parameter_set.mat";
-
-% filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\01-P_10_a_5_10_levels\P_+_NN_Policy_alternative_parameter_set.mat";
-% filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\01-P_10_a_5_10_levels\P_+_OBJ_Policy_alternative_parameter_set.mat";
-
 filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_NN_Policy.mat";
 filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_OBJ_Policy.mat";
-
-% filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\03-Non-minimum phase (HPC)\P_-_NN_Policy_delta_valve_position.mat";
-% filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\03-Non-minimum phase (HPC)\P_-_OBJ_Policy_delta_valve_position.mat";
 
 %% set decay rate for valve positions
 param.gamma1 = 0.43;%0.95; % valve 1 fraction opening
@@ -194,25 +176,6 @@ for currentTimeStamp = 1:1:(simulationTime/Ts)
     fprintf('\n %d \n',currentTimeStamp);
 
 end
-
-%% update trajectories to incorporate zero-order holds
-% u_Reconstruct_CL_trajectory = repelem(u_CL_trajectory,Ts,1);     % control input
-% SP_Reconstruct_trajectory = repelem(SP_trajectory,Ts,1);         % SP
-
-% x_Reconstruct_CL_trajectory = x_CL_trajectory(1,:); % state initialization
-
-% for cntr_Reconstruct = 1:1:simulationTime
-%     x_k(:) = x_Reconstruct_CL_trajectory(cntr_Reconstruct,:);
-% 
-%     u_k = u_Reconstruct_CL_trajectory(cntr_Reconstruct+1,:);     % current control input
-%     SP_k = SP_Reconstruct_trajectory(cntr_Reconstruct+1,:);      % current SP
-%     tspan = linspace(cntr_Reconstruct,cntr_Reconstruct+1*Ts,nmberTspanEntries);
-%     [~,Output_reconstruct] = ode45(@(t,x) myQTPDEs(t,x,param,u_k),tspan,x_k');
-%     x_kPlus1_Reconstruct = Output_reconstruct(end,:);
-%     % extend saved trajectories
-%     x_Reconstruct_CL_trajectory = [x_Reconstruct_CL_trajectory;x_kPlus1_Reconstruct];
-%     
-% end
 
 %% plots
 subplot(2,2,1)
