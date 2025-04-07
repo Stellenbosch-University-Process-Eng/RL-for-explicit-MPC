@@ -73,7 +73,7 @@ h_4_SS_initial_guess = 9.28;
 %% find model steady state
 final_time = 1e6;
 tspan = linspace(0,final_time,final_time); % time span (s)
-[~,Output] = ode23s(@(t,x) QTProcess_NL_const_time(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');
+[~,Output] = ode23s(@(t,x) QTProcess_NL_solve_SS(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');
 
 % extract steady states from simulation output
 h_1_SS = Output(end,1);
@@ -316,7 +316,7 @@ function z = myStateFunction(x,u,param)
 end
 
 %% non-linear dynamic model used to calculate initial steady-state liquid heights
-function dHdt = QTProcess_NL_const_time(t,x,param,v_1,v_2)
+function dHdt = QTProcess_NL_solve_SS(t,x,param,v_1,v_2)
 % Function that contains the differential equations for the non-linear
 % Quadruple Tank benchmark process.
 % x(1) = h1
