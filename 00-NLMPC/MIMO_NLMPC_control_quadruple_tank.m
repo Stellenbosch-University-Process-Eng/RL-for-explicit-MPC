@@ -16,7 +16,7 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1;                   % set the sample time within the MPC object
-nlobj.PredictionHorizon = 100;  % prediction horizon
+nlobj.PredictionHorizon = 52;  % prediction horizon
 nlobj.ControlHorizon = 3;       % number of steps to adjust across the horizon
 
 %% set valve positions
@@ -24,17 +24,17 @@ param.gamma1 = 0.3;     % valve position 1
 param.gamma2 = 0.3;     % valve position 2
 
 %% define parameters for model
-param.A1 = 28; % cross-sectional area (cm^2)
+param.A1 = 10; % cross-sectional area (cm^2)
 param.A3 = param.A1;
-param.A2 = 32;
+param.A2 = 10;
 param.A4 = param.A2;
 param.a1 = 0.071; % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.057;
+param.a2 = 0.071;
 param.a4 = param.a2;
 param.g = 981;   % gravitational acceleration (cm/s^2)
 param.k1 = 3.33; % pump 1 gain (cm^3/V)
-param.k2 = 3.35; % pump 2 gain (cm^3/V)
+param.k2 = 3.33; % pump 2 gain (cm^3/V)
 param.observedGamma1 = param.gamma1;  % fraction valve 1 opening "seen" by the MPC (2023-12-04)
 param.observedGamma2 = param.gamma2;  % fraction valve 2 opening "seen" by the MPC (2023-12-04)
 
@@ -48,8 +48,8 @@ nlobj.Model.NumberOfParameters = 1; % set the number of optional parameters equa
 nlobj.Jacobian.StateFcn = @(x,u,p) myStateJacobian(x,u,param); % specify Jacobian for the predictive model
 
 %% specify initial state, SP, and prediction model inputs
-v_1_SS = 3.15; % pump voltage (V)
-v_2_SS = 3.15; 
+v_1_SS = 3; % pump voltage (V)
+v_2_SS = 3; 
 h_1_SS_initial_guess = 10.18; % liquid height (cm)
 h_2_SS_initial_guess = 15.70;
 h_3_SS_initial_guess = 6.05;
@@ -160,13 +160,13 @@ Cost_trajectory = 0; % initialize variable for optimal costs
 % SP 1
 spSample.setPoint_low = 10; 
 spSample.setPoint_high = 20; 
-spSample.nmberTimes = 3;
+spSample.nmberTimes = 10;
 spSample.stepLim = 1; % step size constraint incorporated on 2024-12-04
 
 % SP 2
 spSample_2.setPoint_low = 10;  
 spSample_2.setPoint_high = 20; 
-spSample_2.nmberTimes = 3;
+spSample_2.nmberTimes = 10;
 spSample_2.stepLim = 1; % step size constraint incorporated on 2024-12-04
 
 % sample SPs
@@ -260,9 +260,9 @@ NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
 NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-% save data
-filename = '/scratch3/20068530/NLMPC_Outputs.mat';
-save(filename,'NLMPC_Outputs',"-v7.3");
+% % save data
+% filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+% save(filename,'NLMPC_Outputs',"-v7.3");
 
 %% plots
 subplot(2,1,1)
