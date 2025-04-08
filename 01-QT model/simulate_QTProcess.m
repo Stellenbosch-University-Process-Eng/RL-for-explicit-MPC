@@ -48,6 +48,19 @@ v_2_dyn = @(t) 3 - 1*(t>10); % pump 2 voltage (V)
 
 [t_dyn,Output_dyn] = ode23s(@(t,x) QTProcess_NL(t,x,param,v_1_dyn,v_2_dyn),tspan_dyn,[h_1_SS,h_2_SS,h_3_SS,h_4_SS]');%,opts);
 
+%% estimate characteristic times of each transfer function describing
+% the linearised reponse of each respective liquid height to the respective
+% pump voltages.
+char_times.T_1 = (param.A1/param.a1)*sqrt(2*h_1_SS/param.g);
+char_times.T_2 = (param.A2/param.a2)*sqrt(2*h_2_SS/param.g);
+char_times.T_3 = (param.A3/param.a3)*sqrt(2*h_3_SS/param.g);
+char_times.T_4 = (param.A4/param.a4)*sqrt(2*h_4_SS/param.g);
+
+char_times.v1_H1 = char_times.T_1;
+char_times.v1_H4 = char_times.T_4 + char_times.T_2;
+char_times.v2_H3 = char_times.T_3 + char_times.T_1;
+char_times.v2_H2 = char_times.T_2;
+
 %% visualise simulation outputs
 myFontSize = 12;
 
