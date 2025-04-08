@@ -35,23 +35,23 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1;                           % set the sample time within the MPC object
-nlobj.PredictionHorizon = 300;          % prediction horizon
-nlobj.ControlHorizon = 2;               % number of steps to adjust across the horizon
+nlobj.PredictionHorizon = 100;          % prediction horizon
+nlobj.ControlHorizon = 3;               % number of steps to adjust across the horizon
 
 %% define parameters for model
-param.A1 = 28;      % cross-sectional area (cm^2)
+param.A1 = 10;      % cross-sectional area (cm^2)
 param.A3 = param.A1;
-param.A2 = 32;
+param.A2 = 10;
 param.A4 = param.A2;
 param.a1 = 0.071;   % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.057;
+param.a2 = 0.071;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
 param.k1 = 3.33;     % pump 1 gain (cm^3/V)
-param.k2 = 3.35;     % pump 2 gain (cm^3/V)
-param.gamma1 = 0.43; % fraction opening pump 1 three-way valve (-)
-param.gamma2 = 0.34; % fraction opening pump 2 three-way valve (-)
+param.k2 = 3.33;     % pump 2 gain (cm^3/V)
+param.gamma1 = 0.55; % fraction opening pump 1 three-way valve (-)
+param.gamma2 = 0.55; % fraction opening pump 2 three-way valve (-)
 
 %% specifying dynamic model
 % https://www.mathworks.com/help/mpc/ug/specify-prediction-model-for-nonlinear-mpc.html
