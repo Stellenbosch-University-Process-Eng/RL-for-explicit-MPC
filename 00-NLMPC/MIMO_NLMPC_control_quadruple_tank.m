@@ -260,9 +260,9 @@ NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
 NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-% % save data
-% filename = '/scratch3/20068530/NLMPC_Outputs.mat';
-% save(filename,'NLMPC_Outputs',"-v7.3");
+% save data
+filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+save(filename,'NLMPC_Outputs',"-v7.3");
 
 %% plots
 subplot(2,1,1)
