@@ -194,10 +194,13 @@ legend('u_1 (V)','u_2 (V)');
 set(gca,'fontsize',25); 
 
 subplot(2,2,3)
-plot(2.*param.gamma_vec,'k-','LineWidth',3);
-yline(1,'Color',[0.6510,0.6510,0.6510],'LineWidth',3); xline(simulationTime,'Color',[0.6510,0.6510,0.6510],'LineWidth',2,'LineStyle',':');
-ylim([0,2]);
-ylabel('2*\gamma'); xlabel('Time (s)');
+if exist('param.gamma_vec','var')
+    plot(2.*param.gamma_vec,'k-','LineWidth',3);
+    yline(1,'Color',[0.6510,0.6510,0.6510],'LineWidth',3); xline(simulationTime,'Color',[0.6510,0.6510,0.6510],'LineWidth',2,'LineStyle',':');
+    ylim([0,2]);
+    ylabel('2*\gamma'); xlabel('Time (s)');
+
+end
 
 set(gcf,'Color','white');
 
