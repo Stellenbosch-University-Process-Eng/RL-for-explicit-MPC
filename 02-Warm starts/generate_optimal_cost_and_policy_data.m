@@ -7,7 +7,7 @@ rng(1)
 tic
 
 %% load matrix of coordinates (2024-02-08)
-nmberLevels = 5;
+nmberLevels = 2;
 nmberRLStates = 6; % states 1-6
 myCoordMat = zeros(nmberLevels^nmberRLStates,nmberRLStates);
 totalCntr = 1;
@@ -50,8 +50,8 @@ param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
 param.k1 = 3.33;     % pump 1 gain (cm^3/V)
 param.k2 = 3.33;     % pump 2 gain (cm^3/V)
-param.gamma1 = 0.55; % fraction opening pump 1 three-way valve (-)
-param.gamma2 = 0.55; % fraction opening pump 2 three-way valve (-)
+param.gamma1 = 0.3; % fraction opening pump 1 three-way valve (-)
+param.gamma2 = 0.3; % fraction opening pump 2 three-way valve (-)
 
 %% specifying dynamic model
 % https://www.mathworks.com/help/mpc/ug/specify-prediction-model-for-nonlinear-mpc.html
@@ -93,11 +93,11 @@ end
 
 nlobj.ManipulatedVariables(1).MaxECR = 0;
 
-% %% set constraints on the measured output
-% for cntr = 1:1:nx
-%     nlobj.States(cntr).Min = 0.005;
-%     nlobj.States(cntr).Max = 100;
-% end
+%% set constraints on the measured output
+for cntr = 1:1:nx
+    nlobj.States(cntr).Min = 0.005;
+    nlobj.States(cntr).Max = 100;
+end
 
 %% specify a custom cost function
 param.Q = [1,0;0,1];   % weighting matrix for cost function (2023-10-28)
@@ -244,22 +244,24 @@ for cntr = 1:1:resolution4Grid^nmberRLStates
 end
 
 %% save relevant results in a structure
-warm_start_data.SP_1_grid = SP_1_grid;
-warm_start_data.SP_2_grid = SP_2_grid;
-warm_start_data.H_1_grid = H_1_grid;
-warm_start_data.H_2_grid = H_2_grid;
-warm_start_data.H_3_grid = H_3_grid;
-warm_start_data.H_4_grid = H_4_grid;
+data_gamma_03_numlevels_3.SP_1_grid = SP_1_grid;
+data_gamma_03_numlevels_3.SP_2_grid = SP_2_grid;
+data_gamma_03_numlevels_3.H_1_grid = H_1_grid;
+data_gamma_03_numlevels_3.H_2_grid = H_2_grid;
+data_gamma_03_numlevels_3.H_3_grid = H_3_grid;
+data_gamma_03_numlevels_3.H_4_grid = H_4_grid;
 
-warm_start_data.u_opt_one = u_opt_one;
-warm_start_data.u_opt_two = u_opt_two;
-warm_start_data.optimalCosts = optimalCosts;
+data_gamma_03_numlevels_3.u_opt_one = u_opt_one;
+data_gamma_03_numlevels_3.u_opt_two = u_opt_two;
+data_gamma_03_numlevels_3.optimalCosts = optimalCosts;
 
-warm_start_data.model_parameters = param;
+data_gamma_03_numlevels_3.model_parameters = param;
 
-% save data
-filename = '/scratch3/20068530/warm_start_data.mat';
-save(filename,'warm_start_data',"-v7.3");
+data_gamma_03_numlevels_3.nmberLevels = nmberLevels;
+
+% % save data
+% filename = '/scratch3/20068530/data_gamma_03_numlevels_3.mat';
+% save(filename,'data_gamma_03_numlevels_3',"-v7.3");
 
 toc
 
