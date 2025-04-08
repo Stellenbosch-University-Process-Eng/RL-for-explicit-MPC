@@ -48,6 +48,16 @@ v_2_dyn = @(t) 3 - 1*(t>10); % pump 2 voltage (V)
 
 [t_dyn,Output_dyn] = ode23s(@(t,x) QTProcess_NL(t,x,param,v_1_dyn,v_2_dyn),tspan_dyn,[h_1_SS,h_2_SS,h_3_SS,h_4_SS]');%,opts);
 
+%% calculate process gain (for concurrent unit increase and unit increase in v1 and v2, respectively)
+abs_Kp_1 = abs( Output_dyn(end,1) - Output_dyn(1,1) );
+abs_Kp_2 = abs( Output_dyn(end,2) - Output_dyn(1,2) );
+
+abs_inv_resp_magnitude_H1 = abs(max(Output_dyn(:,1)) - h_1_SS);
+abs_inv_resp_magnitude_H2 = abs(min(Output_dyn(:,2)) - h_2_SS);
+
+abs_inv_to_Kp_H1 = abs_inv_resp_magnitude_H1/abs_Kp_1
+abs_inv_to_Kp_H2 = abs_inv_resp_magnitude_H2/abs_Kp_2
+
 %% estimate characteristic times of each transfer function describing
 % the linearised reponse of each respective liquid height to the respective
 % pump voltages.
