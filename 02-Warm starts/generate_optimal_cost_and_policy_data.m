@@ -7,7 +7,7 @@ rng(1)
 tic
 
 %% load matrix of coordinates (2024-02-08)
-nmberLevels = 2;
+nmberLevels = 6;
 nmberRLStates = 6; % states 1-6
 myCoordMat = zeros(nmberLevels^nmberRLStates,nmberRLStates);
 totalCntr = 1;
@@ -50,8 +50,8 @@ param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
 param.k1 = 3.33;     % pump 1 gain (cm^3/V)
 param.k2 = 3.33;     % pump 2 gain (cm^3/V)
-param.gamma1 = 0.3; % fraction opening pump 1 three-way valve (-)
-param.gamma2 = 0.3; % fraction opening pump 2 three-way valve (-)
+param.gamma1 = 0.42; % fraction opening pump 1 three-way valve (-)
+param.gamma2 = 0.42; % fraction opening pump 2 three-way valve (-)
 
 %% specifying dynamic model
 % https://www.mathworks.com/help/mpc/ug/specify-prediction-model-for-nonlinear-mpc.html
@@ -244,24 +244,24 @@ for cntr = 1:1:resolution4Grid^nmberRLStates
 end
 
 %% save relevant results in a structure
-data_gamma_03_numlevels_3.SP_1_grid = SP_1_grid;
-data_gamma_03_numlevels_3.SP_2_grid = SP_2_grid;
-data_gamma_03_numlevels_3.H_1_grid = H_1_grid;
-data_gamma_03_numlevels_3.H_2_grid = H_2_grid;
-data_gamma_03_numlevels_3.H_3_grid = H_3_grid;
-data_gamma_03_numlevels_3.H_4_grid = H_4_grid;
+data_gamma_042_numlevels_6.SP_1_grid = SP_1_grid;
+data_gamma_042_numlevels_6.SP_2_grid = SP_2_grid;
+data_gamma_042_numlevels_6.H_1_grid = H_1_grid;
+data_gamma_042_numlevels_6.H_2_grid = H_2_grid;
+data_gamma_042_numlevels_6.H_3_grid = H_3_grid;
+data_gamma_042_numlevels_6.H_4_grid = H_4_grid;
 
-data_gamma_03_numlevels_3.u_opt_one = u_opt_one;
-data_gamma_03_numlevels_3.u_opt_two = u_opt_two;
-data_gamma_03_numlevels_3.optimalCosts = optimalCosts;
+data_gamma_042_numlevels_6.u_opt_one = u_opt_one;
+data_gamma_042_numlevels_6.u_opt_two = u_opt_two;
+data_gamma_042_numlevels_6.optimalCosts = optimalCosts;
 
-data_gamma_03_numlevels_3.model_parameters = param;
+data_gamma_042_numlevels_6.model_parameters = param;
 
-data_gamma_03_numlevels_3.nmberLevels = nmberLevels;
+data_gamma_042_numlevels_6.nmberLevels = nmberLevels;
 
-% % save data
-% filename = '/scratch3/20068530/data_gamma_03_numlevels_3.mat';
-% save(filename,'data_gamma_03_numlevels_3',"-v7.3");
+% save data
+filename = '/scratch3/20068530/data_gamma_042_numlevels_6.mat';
+save(filename,'data_gamma_042_numlevels_6',"-v7.3");
 
 toc
 

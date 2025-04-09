@@ -2,7 +2,7 @@
 %% Date: 2024-10-16
 
 c = parcluster(); % initialize cluster using the default profile
-c.AdditionalProperties.Host = 'comp033'; 
+c.AdditionalProperties.Host = 'comp047'; 
 ncpu = 16; % number of cpu cores
 
 % submit job to the SU cluster
