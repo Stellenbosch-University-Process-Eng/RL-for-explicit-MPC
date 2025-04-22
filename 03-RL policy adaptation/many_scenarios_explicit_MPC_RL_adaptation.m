@@ -53,7 +53,6 @@ for scenarioCntr = 1:1:numberScenarios
     param.satPenaltyMagnitude = 0.2;    % magnitude of penalty for saturating the final element (2023-05-03)
     
     %% load warm-starting policy (2023-06-14)
-    %filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_NN_Policy_nominal_from_draft_paper_2.mat";
     filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_NN_Policy.mat";
     B = load(filename_warm_policy);
     actor.NN = B.NN; % 2023-02-08
@@ -63,18 +62,13 @@ for scenarioCntr = 1:1:numberScenarios
     actor.NN.k_hidden_warm = actor.NN.k_hidden; % define "actor.NN.k_hidden_warm" for use in the function "evaluateRBFhiddenlayer_001" (2023-10-10)
     
     %% load critic network
-    %filename_critic_warm_start = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_NN_Value_nominal_from_draft_paper_2.mat";
     filename_critic_warm_start = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_NN_Value_trainbr.mat";
 
     C = load(filename_critic_warm_start);
     critic.NN = C.NN;
-    critic.NN.alpha = 0.5;%0.01;%0.5;%1e-5;%5e-5;%0.0001; % critic learning rate
+    critic.NN.alpha = 0.5; % critic learning rate
     
     %% specify paths for preprocessing- and postprocessing data (2023-11-27)
-    %filename_state_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_state_scaling_data.mat"; % state scaling
-    %filename_control_input_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_action_scaling_data_nominal_from_draft_paper_2.mat"; % control input scaling 
-    %filename_state_value_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_value_scaling_data_nominal_from_draft_paper_2.mat"; % state-value scaling
-    
     filename_state_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_state_scaling_data.mat"; % state scaling
     filename_control_input_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_action_scaling_data.mat"; % control input scaling 
     filename_state_value_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_value_scaling_data_trainbr.mat"; % state-value scaling
@@ -90,7 +84,7 @@ for scenarioCntr = 1:1:numberScenarios
     param.PS_Value_targets = PS_Value_targets;
     
     %% initialize average reward and relevant learning rate (2023-06-29)
-    param.avgRAlpha = 0.9;%0.5;%1e-4;%0.5;%1e-5;%1e-4;    % learning rate used to update the average reward (2023-06-29)
+    param.avgRAlpha = 0.9;     % learning rate used to update the average reward (2023-06-29)
     param.avgR = 0;            % initialize average reward (2023-06-29)
     
     %% set interval between reported step numbers (2023-06-30)
@@ -109,15 +103,15 @@ for scenarioCntr = 1:1:numberScenarios
     param.a3 = param.a1;
     param.a2 = 0.071;
     param.a4 = param.a2;
-    param.g = 981;       % gravitational acceleration (cm/s^2)
-    param.k1 = 3.14;%2;%3.33; %1;    % pump 1 gain (cm^3/V)
-    param.k2 = 3.29;%2;%3.33;     % pump 2 gain (cm^3/V)
-    param.gamma1 = 0.43;%param.initial_gammas; % fraction opening pump 1 three-way valve (-)
-    param.gamma2 = 0.34;%param.initial_gammas; % fraction opening pump 2 three-way valve (-)
+    param.g = 981;          % gravitational acceleration (cm/s^2)
+    param.k1 = 3.14;        % pump 1 gain (cm^3/V)
+    param.k2 = 3.29;        % pump 2 gain (cm^3/V)
+    param.gamma1 = 0.43;    % fraction opening pump 1 three-way valve (-)
+    param.gamma2 = 0.34;    % fraction opening pump 2 three-way valve (-)
     
     %% specify initial state, SP, and prediction model inputs
-    v_1_SS = 3.15;%3; %-(3-miniumSetting)*(t>3000); % pump voltage (V)
-    v_2_SS = 3.15;%3; %-(3-miniumSetting)*(t>3000);
+    v_1_SS = 3.15;          % pump voltage (V)
+    v_2_SS = 3.15;
     h_1_SS_initial_guess = 10.18; % liquid height (cm)
     h_2_SS_initial_guess = 15.70;
     h_3_SS_initial_guess = 6.05;
@@ -143,8 +137,8 @@ for scenarioCntr = 1:1:numberScenarios
     param.nmberOfSteps = nmberStepsSpecified;   % number of steps per episode
     
     %% bounds for reward scaling
-    R_bounds.low = 0;%-10;%-1000;%0;               % low bound for squared error reward function, 2022-10-14
-    R_bounds.high = 1;%0;   %1;               % high bound for squared error reward function, 2022-10-14
+    R_bounds.low = 0;                % low bound for squared error reward function, 2022-10-14
+    R_bounds.high = 1;               % high bound for squared error reward function, 2022-10-14
     
     %% parameters used for SP sampling
     % SP 1
@@ -166,18 +160,17 @@ for scenarioCntr = 1:1:numberScenarios
     spSample.SP_samples_2 = spSample.setPoint_low_2 + (spSample.setPoint_high_2 - spSample.setPoint_low_2)*rand(1,spSample.nmberTimes_2);
      
     %% initialize counters and levels for the step size parameter (2022-10-17)
-    %lrsConsidered = linspace(0,1e-4,10);
-    StepSizes.nmberOfStepSizeLevels = 4;   % number of step size levels to consider, 2022-10-17
+    StepSizes.nmberOfStepSizeLevels = 4;    % number of step size levels to consider, 2022-10-17
     StepSizes.low_stepSizeBound = 0;        % lower bound for step sizes, 2022-10-17
-    StepSizes.high_stepSizeBound = 3.33e-4; %2e-5;%1e-4;%3e-4;    % upper bound for step sizes, 2022-10-17
+    StepSizes.high_stepSizeBound = 3.33e-4; % upper bound for step sizes, 2022-10-17
     StepSizes.hyperparameterValues = linspace(StepSizes.low_stepSizeBound,StepSizes.high_stepSizeBound,StepSizes.nmberOfStepSizeLevels); % step sizes at which to conduct training, 2022-10-17
     
     % ranges for pump voltages (2022-11-05).  These are hard constraints.
-    param.lower_u_1 = 0.1;%0.0001;%0.2;
-    param.lower_u_2 = 0.1;%0.0001;%0.2;
+    param.lower_u_1 = 0.1;
+    param.lower_u_2 = 0.1;
     
-    param.upper_u_1 = 30;%200;%100;
-    param.upper_u_2 = 30;%200;%100;
+    param.upper_u_1 = 30;
+    param.upper_u_2 = 30;
     
     %% specify the number of output nodes for the actor
     actor.NN.k_output = 2; % set the number of output nodes for the actor equal to two (2023-11-30)
@@ -187,8 +180,8 @@ for scenarioCntr = 1:1:numberScenarios
     param.saveCntr = 1; % counter used to index saved actor networks
     
     %% define eligibility trace vectors
-    param.actor_lambda = 0;%0.9;%0;%0.9;  % actor trace-decay parameter
-    param.critic_lambda = 0;%0.9;%0;%0.9; % critic trace-decay parameter
+    param.actor_lambda = 0;     % actor trace-decay parameter
+    param.critic_lambda = 0;    % critic trace-decay parameter
     
     % actor
     param.trace_actor_hidden = zeros(size(actor.NN.hidden_layer_parameters,1),size(actor.NN.hidden_layer_parameters,2)); % eligibility trace for hidden layer parameters
@@ -197,17 +190,6 @@ for scenarioCntr = 1:1:numberScenarios
     % critic
     param.trace_critic_hidden = zeros(size(critic.NN.hidden_layer_parameters,1),size(critic.NN.hidden_layer_parameters,2)); % eligibility trace for hidden layer parameters
     param.trace_critic_output = zeros(size(critic.NN.output_layer_parameters,1),size(critic.NN.output_layer_parameters,2)); % eligibility trace for output layer parameters
-    
-    %%
-%     filename_scratch_hidden_layer_initialization = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\01-Draft_2_nom_to_adjusted\Scratch_hidden_layer_initialization.mat";
-%     filename_scratch_output_layer_initialization = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\01-Draft_2_nom_to_adjusted\Scratch_output_layer_initialization.mat";
-%     
-%     load(filename_scratch_hidden_layer_initialization)
-%     load(filename_scratch_output_layer_initialization)
-% 
-%     critic.NN.hidden_layer_parameters = hidden_layer_scratch_start;
-%     critic.NN.output_layer_parameters = output_layer_scratch_start;
-    %rng(2)
 
     %% train the agents
     parfor hyperparameterCntr = 1:StepSizes.nmberOfStepSizeLevels
@@ -248,29 +230,6 @@ end % end loop through scenarios
 %%
 delete(myPool)
 
-%% plots
-% warm_start_lr = 1;
-% learning_rate_index = 4;%6;
-% scenario_index = 2;%50;%36;
-% 
-% t = tiledlayout(8,4);
-% 
-% nexttile(1,[4,4]);
-% plot(all_scenarios_out_Experience{scenario_index, 1}(learning_rate_index).State_1,'b-','LineWidth',2); hold on;
-% plot(all_scenarios_out_Experience{scenario_index, 1}(learning_rate_index).State_3,'k-','LineWidth',2);
-% plot(all_scenarios_out_Experience{scenario_index, 1}(warm_start_lr).State_3,'r-','LineWidth',2);
-% set(gcf,'Color','w'); set(gca,'FontSize',20);
-% xlabel('Time (s)'); ylabel('H_1 (m)');
-% legend('H_1 SP','H_1 RL','H_1 warm start');
-% 
-% nexttile(17,[4,4]);
-% plot(all_scenarios_out_Experience{scenario_index, 1}(learning_rate_index).State_2,'b-','LineWidth',2); hold on;
-% plot(all_scenarios_out_Experience{scenario_index, 1}(learning_rate_index).State_4,'k-','LineWidth',2);
-% plot(all_scenarios_out_Experience{scenario_index, 1}(warm_start_lr).State_4,'r-','LineWidth',2);
-% set(gcf,'Color','w'); set(gca,'FontSize',20);
-% xlabel('Time (s)'); ylabel('H_2 (m)');
-% legend('H_2 SP','H_2 RL','H_2 warm start');
-
 %%
 toc % moved 2022-10-17
 
@@ -292,7 +251,7 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
         %% select first state components
         if currentTimeStamp == 1
             State_1(currentTimeStamp) = p.SP(1);      % SP for height 1 state 1 (2023-11-05)
-            State_2(currentTimeStamp) = p.SP(2);       % SP for height 2 state 2 (2023-11-17)
+            State_2(currentTimeStamp) = p.SP(2);      % SP for height 2 state 2 (2023-11-17)
             State_3(currentTimeStamp) = p.x0(1);      % H_1 is state 2 (2023-11-05)
             State_4(currentTimeStamp) = p.x0(2);      % H_2 is state 3 (2023-11-05)
             State_5(currentTimeStamp) = p.x0(3);      % H_3 is state 4 (2023-11-05)
@@ -431,10 +390,6 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
             R = -1*( (nxtState_1(currentTimeStamp) - nxtState_3(currentTimeStamp) )^2 + (nxtState_2(currentTimeStamp) - nxtState_4(currentTimeStamp) )^2);
             
             R = scaleRewards(R,R_bounds); % 2022-10-14
-%             % place a lower bound on the rewards
-%             if R < -100  
-%                 R = -100;
-%             end
 
             if exist('SATFLAG','var') && SATFLAG == 1
                 if p.includeSaturationPenalty == 1
