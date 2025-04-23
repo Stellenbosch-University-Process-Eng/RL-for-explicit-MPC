@@ -213,7 +213,14 @@ end % end loop through scenarios
 %%
 delete(myPool)
 
-%%
+%% save results
+test_results.Experience = all_scenarios_out_Experience; % save experience generated during training
+test_results.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+test_results.logging.model_parameters = param;          % save dynamic model's parameters
+
+filename = '/scratch3/20068530/test_results';
+save(filename,'test_results',"-v7.3");
+
 toc % moved 2022-10-17
 
 %% functions 
