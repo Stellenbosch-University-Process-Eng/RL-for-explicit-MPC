@@ -4,37 +4,29 @@
 clc;clearvars -except ans;close all;
 rng(2);
 
-%% specify paths for to the relevant training data
-filename_SP_1_input = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\SP_1_grid.mat"; % (2023-11-16)
-filename_SP_2_input = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\SP_2_grid.mat"; % (2023-11-16)
-filename_H_One_input = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\H_1_grid.mat";
-filename_H_Two_input = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\H_2_grid.mat";
-filename_H_Three_input = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\H_3_grid.mat";
-filename_H_Four_input = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\H_4_grid.mat";
+%% specify valve position and number of levels for each state
+gamma_val = 0.3;
+numLevels = 2;
 
-filename_u_optimal_one = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_u_opt_one_alternative_parameter_set.mat";
-filename_u_optimal_two = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\02-Minimum phase (HPC)\02-P_10_a_5_5_levels\P_+_u_opt_two_alternative_parameter_set.mat";
+%% load structure containing all training data
+gammaMult100 = 100*gamma_val;
+filename_test = sprintf('data_gamma_%03d_numlevels_%d',gammaMult100,numLevels);
+test_file = load(filename_test);
+test_varname = fieldnames(test_file);
+test_varname = test_varname{1};
 
-%% load the training data
-load(filename_SP_1_input);    % load SP inputs (2023-11-16)
-load(filename_SP_2_input);    % load SP 2 inputs (2023-11-16)
-load(filename_H_One_input);   % load H one inputs
-load(filename_H_Two_input);   % load H two inputs
-load(filename_H_Three_input); % load H three inputs
-load(filename_H_Four_input);  % load H four inputs
-load(filename_u_optimal_one); % load u one inputs
-load(filename_u_optimal_two); % load u two inputs
+training_data = test_file.(test_varname);
 
 %% data processing
-data.SP_input_1_reshaped = reshape(SP_1_grid,1,size(SP_1_grid,1)*size(SP_1_grid,2)*size(SP_1_grid,3)*size(SP_1_grid,4)*size(SP_1_grid,5)*size(SP_1_grid,6));       % reshape SP coordinates
-data.SP_input_2_reshaped = reshape(SP_2_grid,1,size(SP_2_grid,1)*size(SP_2_grid,2)*size(SP_2_grid,3)*size(SP_2_grid,4)*size(SP_2_grid,5)*size(SP_2_grid,6));       % reshape SP coordinates (2023-11-16)
-data.H_one_reshaped = reshape(H_1_grid,1,size(H_1_grid,1)*size(H_1_grid,2)*size(H_1_grid,3)*size(H_1_grid,4)*size(H_1_grid,5)*size(H_1_grid,6));    % reshape H1 coordinates (2023-11-01)
-data.H_two_reshaped = reshape(H_2_grid,1,size(H_2_grid,1)*size(H_2_grid,2)*size(H_2_grid,3)*size(H_2_grid,4)*size(H_2_grid,5)*size(H_2_grid,6));    % reshape H2 coordinates (2023-11-01)
-data.H_three_reshaped = reshape(H_3_grid,1,size(H_3_grid,1)*size(H_3_grid,2)*size(H_3_grid,3)*size(H_3_grid,4)*size(H_3_grid,5)*size(H_3_grid,6));  % reshape H3 coordinates (2023-11-01)
-data.H_four_reshaped = reshape(H_4_grid,1,size(H_4_grid,1)*size(H_4_grid,2)*size(H_4_grid,3)*size(H_4_grid,4)*size(H_4_grid,5)*size(H_4_grid,6));   % reshape H4 coordinates (2023-11-01)
+data.SP_input_1_reshaped = reshape(training_data.SP_1_grid,1,size(training_data.SP_1_grid,1)*size(training_data.SP_1_grid,2)*size(training_data.SP_1_grid,3)*size(training_data.SP_1_grid,4)*size(training_data.SP_1_grid,5)*size(training_data.SP_1_grid,6));       % reshape SP coordinates
+data.SP_input_2_reshaped = reshape(training_data.SP_2_grid,1,size(training_data.SP_2_grid,1)*size(training_data.SP_2_grid,2)*size(training_data.SP_2_grid,3)*size(training_data.SP_2_grid,4)*size(training_data.SP_2_grid,5)*size(training_data.SP_2_grid,6));       % reshape SP coordinates (2023-11-16)
+data.H_one_reshaped = reshape(training_data.H_1_grid,1,size(training_data.H_1_grid,1)*size(training_data.H_1_grid,2)*size(training_data.H_1_grid,3)*size(training_data.H_1_grid,4)*size(training_data.H_1_grid,5)*size(training_data.H_1_grid,6));    % reshape H1 coordinates (2023-11-01)
+data.H_two_reshaped = reshape(training_data.H_2_grid,1,size(training_data.H_2_grid,1)*size(training_data.H_2_grid,2)*size(training_data.H_2_grid,3)*size(training_data.H_2_grid,4)*size(training_data.H_2_grid,5)*size(training_data.H_2_grid,6));    % reshape H2 coordinates (2023-11-01)
+data.H_three_reshaped = reshape(training_data.H_3_grid,1,size(training_data.H_3_grid,1)*size(training_data.H_3_grid,2)*size(training_data.H_3_grid,3)*size(training_data.H_3_grid,4)*size(training_data.H_3_grid,5)*size(training_data.H_3_grid,6));  % reshape H3 coordinates (2023-11-01)
+data.H_four_reshaped = reshape(training_data.H_4_grid,1,size(training_data.H_4_grid,1)*size(training_data.H_4_grid,2)*size(training_data.H_4_grid,3)*size(training_data.H_4_grid,4)*size(training_data.H_4_grid,5)*size(training_data.H_4_grid,6));   % reshape H4 coordinates (2023-11-01)
 
-data.u_optimal_one_reshaped = reshape(u_opt_one,1,size(u_opt_one,1)*size(u_opt_one,2)*size(u_opt_one,3)*size(u_opt_one,4)*size(u_opt_one,5)*size(u_opt_one,6)); % reshape u1 coordinates (2023-11-01)
-data.u_optimal_two_reshaped = reshape(u_opt_two,1,size(u_opt_two,1)*size(u_opt_two,2)*size(u_opt_two,3)*size(u_opt_two,4)*size(u_opt_two,5)*size(u_opt_two,6)); % reshape u1 coordinates (2023-11-01)
+data.u_optimal_one_reshaped = reshape(training_data.u_opt_one,1,size(training_data.u_opt_one,1)*size(training_data.u_opt_one,2)*size(training_data.u_opt_one,3)*size(training_data.u_opt_one,4)*size(training_data.u_opt_one,5)*size(training_data.u_opt_one,6)); % reshape u1 coordinates (2023-11-01)
+data.u_optimal_two_reshaped = reshape(training_data.u_opt_two,1,size(training_data.u_opt_two,1)*size(training_data.u_opt_two,2)*size(training_data.u_opt_two,3)*size(training_data.u_opt_two,4)*size(training_data.u_opt_two,5)*size(training_data.u_opt_two,6)); % reshape u1 coordinates (2023-11-01)
 
 data.P_mat = [data.SP_input_1_reshaped;data.SP_input_2_reshaped;data.H_one_reshaped;data.H_two_reshaped;data.H_three_reshaped;data.H_four_reshaped]; % create a matrix containing all inputs (2023-11-16)
 data.T_mat = [data.u_optimal_one_reshaped;data.u_optimal_two_reshaped]; % create a matrix containing all targets (2023-11-01)
