@@ -8,17 +8,20 @@ rng(1)
 
 tic 
 
+%% load policy data
+load("policy_data_gamma_0Point55_numLevels_6.mat");
+
 %% set decay rate for valve positions
-param.gamma1 = 0.55;    % valve 1 fraction opening
-param.gamma2 = 0.55;    % valve 2 fraction opening
+param.gamma1 = policy_data.gamma_val;    % valve 1 fraction opening
+param.gamma2 = policy_data.gamma_val;    % valve 2 fraction opening
 
 %% load warm-starting policy
-load("NN_gamma_0Point55_4_Lvls.mat");
+NN = policy_data.NN;
 NN.k_hidden_warm = NN.k_hidden; % no cold-starting node addition
 NN.activation_type = 1; % set output activation to linear
 NN.linearActM = 1;    
 
-load("net_gamma_0Point55_4_Lvls.mat");
+net = policy_data.pol_net;
 
 %% define parameters for model
 param.A1 = 10;      % cross-sectional area (cm^2)
@@ -90,13 +93,9 @@ nmberTspanEntries = 100;
 
 Ts = 1; % sampling period
 
-%% specify paths for preprocessing- and postprocessing data
-filename_state_scaling_structure = 'C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\00-Minimum phase region\P_+_state_scaling_data.mat'; % state scaling
-filename_control_input_scaling_structure = 'C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\00-Minimum phase region\P_+_action_scaling_data.mat'; % control input scaling 
-
-%% load preprocessing- and postprocessing data
-load(filename_state_scaling_structure); % load state scaling data
-load(filename_control_input_scaling_structure); % load control input scaling data
+%% preprocessing- and postprocessing data
+PS_input = policy_data.state_scaling;
+PS_targets = policy_data.action_scaling;
 
 for currentTimeStamp = 1:1:(simulationTime/Ts)
 
