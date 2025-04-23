@@ -103,3 +103,11 @@ valTargets = data.T_mat(tr.valInd);
 testingTargets = data.T_mat(tr.testInd);
 
 plotregression(trTargets,trOut,'Train',valTargets,valOut,'Validation',testingTargets,testingOut,'Testing');
+
+%% store trained NN and scaling data
+value_data.NN = NN; % NN structure
+value_data.val_net = net; % NN object
+value_data.state_scaling = PS_input; % state scaling
+value_data.action_scaling = PS_Value_targets; % action scaling
+value_data.gamma_val = gamma_val; % valve fraction opening
+value_data.numLevels = numLevels; % number of SP levels

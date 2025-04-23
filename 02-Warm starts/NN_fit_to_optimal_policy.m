@@ -5,8 +5,8 @@ clc;clearvars -except ans;close all;
 rng(2);
 
 %% specify valve position and number of levels for each state
-gamma_val = 0.55;
-numLevels = 4;
+gamma_val = 0.3;
+numLevels = 6;
 
 %% load structure containing all training data
 gammaMult100 = floor(100*gamma_val);
@@ -108,3 +108,11 @@ valTargets = data.T_mat(tr.valInd);
 testingTargets = data.T_mat(tr.testInd);
 
 plotregression(trTargets,trOut,'Train',valTargets,valOut,'Validation',testingTargets,testingOut,'Testing');
+
+%% store trained NN and scaling data
+policy_data.NN = NN; % NN structure
+policy_data.pol_net = net; % NN object
+policy_data.state_scaling = PS_input; % state scaling
+policy_data.action_scaling = PS_targets; % action scaling
+policy_data.gamma_val = gamma_val; % valve fraction opening
+policy_data.numLevels = numLevels; % number of SP levels
