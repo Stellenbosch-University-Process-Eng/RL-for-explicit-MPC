@@ -8,34 +8,30 @@ rng(1)
 
 tic 
 
-%% specify path to warm-starting policy
-filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_NN_Policy.mat";
-filename_warm_net_obj = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_OBJ_Policy.mat";
-
 %% set decay rate for valve positions
-param.gamma1 = 0.43;    % valve 1 fraction opening
-param.gamma2 = 0.34;    % valve 2 fraction opening
+param.gamma1 = 0.55;    % valve 1 fraction opening
+param.gamma2 = 0.55;    % valve 2 fraction opening
 
 %% load warm-starting policy
-load(filename_warm_policy);
+load("NN_gamma_0Point55_4_Lvls.mat");
 NN.k_hidden_warm = NN.k_hidden; % no cold-starting node addition
 NN.activation_type = 1; % set output activation to linear
 NN.linearActM = 1;    
 
-load(filename_warm_net_obj);
+load("net_gamma_0Point55_4_Lvls.mat");
 
 %% define parameters for model
-param.A1 = 28;       % cross-sectional area (cm^2)
+param.A1 = 10;      % cross-sectional area (cm^2)
 param.A3 = param.A1;
-param.A2 = 32;
+param.A2 = 10;
 param.A4 = param.A2;
 param.a1 = 0.071;   % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.057;
+param.a2 = 0.071;
 param.a4 = param.a2;
-param.g = 981;      % gravitational acceleration (cm/s^2)
-param.k1 = 3.14;    % pump 1 gain (cm^3/V)
-param.k2 = 3.29;    % pump 2 gain (cm^3/V)
+param.g = 981;       % gravitational acceleration (cm/s^2)
+param.k1 = 3.33;     % pump 1 gain (cm^3/V)
+param.k2 = 3.33;     % pump 2 gain (cm^3/V)
 
 %% specify initial state, SP, and prediction model inputs
 v_1_SS = 3.15;
@@ -61,7 +57,7 @@ u0 = [v_1_SS,v_2_SS]'; % nominal inputs to the model
 SP = [h_1_SS,h_2_SS,0,0]; % set point
 
 %% simulate closed-loop control under non-linear MPC
-simulationTime = 50000;      % number of time steps to simulate
+simulationTime = 20000;%50000;      % number of time steps to simulate
 x_CL_trajectory = x0';       % initialize liquid height trajectory 
 u_CL_trajectory = u0';       % initialize MV trajectory
 SP_trajectory = SP;          % initialize SP trajectory

@@ -5,11 +5,11 @@ clc;clearvars -except ans;close all;
 rng(2);
 
 %% specify valve position and number of levels for each state
-gamma_val = 0.3;
-numLevels = 2;
+gamma_val = 0.55;
+numLevels = 4;
 
 %% load structure containing all training data
-gammaMult100 = 100*gamma_val;
+gammaMult100 = floor(100*gamma_val);
 filename_test = sprintf('data_gamma_%03d_numlevels_%d',gammaMult100,numLevels);
 test_file = load(filename_test);
 test_varname = fieldnames(test_file);
