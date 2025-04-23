@@ -71,22 +71,24 @@ Limits.u_upper = 30;     % maximum pump voltage (V)
 
 %% parameters used for SP sampling
 % SP 1
-spSample.setPoint_low = 20;
-spSample.setPoint_high = 30;
-spSample.nmberTimes = 10;
+spSample.setPoint_low = h_1_SS-1;
+spSample.setPoint_high = h_1_SS+1;
+spSample.nmberTimes = 4;
+spSample.stepLim = 0.1; % step size constraint incorporated on 2024-12-04
 
 % SP 2
-spSample.setPoint_low_2 = 20; 
-spSample.setPoint_high_2 = 30; 
-spSample.nmberTimes_2 = 10;
+spSample_2.setPoint_low = h_2_SS-1; 
+spSample_2.setPoint_high = h_2_SS+1; 
+spSample_2.nmberTimes = 4;
+spSample_2.stepLim = 0.1; % step size constraint incorporated on 2024-12-04
 
 % sample SPs
 spSample.sampleTimes = randi([1,simulationTime],1,spSample.nmberTimes);
-spSample.SP_samples = spSample.setPoint_low + (spSample.setPoint_high - spSample.setPoint_low_2)*rand(1,spSample.nmberTimes);
+spSample = quadruple_tank_step_constrained_SP_sampling(spSample,SP,1);
 
 % sample SP 2 (2023-11-26)
-spSample.sampleTimes_2 = randi([1,simulationTime],1,spSample.nmberTimes_2);
-spSample.SP_samples_2 = spSample.setPoint_low_2 + (spSample.setPoint_high_2 - spSample.setPoint_low_2)*rand(1,spSample.nmberTimes_2);
+spSample_2.sampleTimes = randi([1,simulationTime],1,spSample_2.nmberTimes);
+spSample_2 = quadruple_tank_step_constrained_SP_sampling(spSample_2,SP,2);
 
 %% number of entries in tspan vector
 nmberTspanEntries = 100;
@@ -108,9 +110,9 @@ for currentTimeStamp = 1:1:(simulationTime/Ts)
                 end
             end
             % sample H2 SP (2023-11-17)
-            for j = 1:1:size(spSample.sampleTimes_2,2)
-                if spSample.sampleTimes_2(j) == currentTimeStamp
-                    SP(2) = spSample.SP_samples_2(j); % (2023-11-17)
+            for j = 1:1:size(spSample_2.sampleTimes,2)
+                if spSample_2.sampleTimes(j) == currentTimeStamp
+                    SP(2) = spSample_2.SP_samples(j); % (2023-11-17)
                 end
             end
     x_k = x_CL_trajectory(currentTimeStamp,:);
