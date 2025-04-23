@@ -3,27 +3,10 @@
 %% Name: Edward Bras
 %% Date: 2024-04-26
 clc
-clearvars -except ans
+clearvars -except ans; close all;
 rng(2)
 
-%% prompt user to specify the number of training steps
-prompt_1 = "Number of training steps:";
-
-%% prompt user to specify the number of SP changes (2023-06-30)
-prompt_2 = "Number of sampled SPs in the range [1,2]:";
-
-%% prompt user to specify the number of DV changes (2023-06-30)
-prompt_3 = "Number of sampled DVs in the range [0.18 m^3/min,0.2 m^3/min]:";
-
-%% prompt user to specify the upper bound of time steps at which progress must be reported (2023-10-10)
-prompt_4 = "Upper limit of reporting vector:";
-
-%% prompt user to specify the upper bound of time steps at which policies must be saved (2023-10-10)
-prompt_5 = "Upper limit of policy saving vector:";
-
-%% prompt user to specify the number of training scenarios to be simulated
-prompt_6 = "Number of training scenarios:";
-
+%%
 tic % start measuring wall time
 
 %% start parallel pool, 2022-10-17
@@ -31,10 +14,10 @@ myPool = parpool('local');
 
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
-nmberStepsSpecified = input(prompt_1);
-upperReportVec = input(prompt_4);
-upperPolicySavingVec = input(prompt_5);
-numberScenarios = input(prompt_6);
+nmberStepsSpecified = 1000;
+upperReportVec = nmberStepsSpecified;
+upperPolicySavingVec = nmberStepsSpecified;
+numberScenarios = 2;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
@@ -176,7 +159,7 @@ for scenarioCntr = 1:1:numberScenarios
     actor.NN.k_output = 2; % set the number of output nodes for the actor equal to two (2023-11-30)
     
     %% specify time steps for which actor networks must be saved
-    param.policySavingVec = 0:1000:upperPolicySavingVec; %0:100:input(prompt_5);
+    param.policySavingVec = 0:1000:upperPolicySavingVec; 
     param.saveCntr = 1; % counter used to index saved actor networks
     
     %% define eligibility trace vectors
