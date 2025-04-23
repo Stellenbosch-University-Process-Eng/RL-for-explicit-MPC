@@ -108,12 +108,3 @@ valTargets = data.T_mat(tr.valInd);
 testingTargets = data.T_mat(tr.testInd);
 
 plotregression(trTargets,trOut,'Train',valTargets,valOut,'Validation',testingTargets,testingOut,'Testing');
-
-subplot(2,2,1)
-set(gca,'FontSize',15);
-subplot(2,2,2)
-set(gca,'FontSize',15);
-subplot(2,2,3)
-set(gca,'FontSize',15);
-
-set(gcf,'Color','w');
