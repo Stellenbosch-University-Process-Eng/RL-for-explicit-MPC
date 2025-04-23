@@ -1,0 +1,17 @@
+%% script used to submit RL adaptation code to the SU HPC.
+%% Name: Edward Bras
+%% Date: 2025-04-23
+
+clc;clearvars -except ans;
+%%
+c = parcluster(); % initialize cluster using the default profile
+c.AdditionalProperties.Host = 'comp064'; 
+ncpu = 16; % number of cpu cores
+
+% submit job to the SU cluster
+adapt_explicit_MPC = batch(c,'many_scenarios_explicit_MPC_RL_adaptation','Pool',ncpu,'CaptureDiary',true,'AttachedFiles',...
+    {'ActorbackProp_ReLU_tanh_EL_traces.m',...
+    'evaluate_ReLU_tanh_six_states.m',...
+    'evaluate_ReLU_tanh_six_states_one_output.m',...
+    'Update_critic_parameters_ReLU_tanh_EL_traces.m',...
+    'update_EL_trace_vector.m'});
