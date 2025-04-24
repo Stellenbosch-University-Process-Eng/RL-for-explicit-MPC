@@ -5,7 +5,7 @@ clc;clearvars -except ans;close all;
 rng(2);
 
 %% specify valve position and number of levels for each state
-gamma_val = 0.3;
+gamma_val = 0.42;
 numLevels = 6;
 
 %% load structure containing all training data

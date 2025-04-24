@@ -9,7 +9,7 @@ rng(1)
 tic 
 
 %% load policy data
-load("policy_data_gamma_0Point55_numLevels_6.mat");
+load("policy_data_gamma_0Point42_numLevels_6.mat");
 
 %% set decay rate for valve positions
 param.gamma1 = policy_data.gamma_val;    % valve 1 fraction opening
@@ -60,7 +60,7 @@ u0 = [v_1_SS,v_2_SS]'; % nominal inputs to the model
 SP = [h_1_SS,h_2_SS,0,0]; % set point
 
 %% simulate closed-loop control under non-linear MPC
-simulationTime = 20000;%50000;      % number of time steps to simulate
+simulationTime = 1000;%50000;      % number of time steps to simulate
 x_CL_trajectory = x0';       % initialize liquid height trajectory 
 u_CL_trajectory = u0';       % initialize MV trajectory
 SP_trajectory = SP;          % initialize SP trajectory
@@ -71,16 +71,16 @@ Limits.u_upper = 30;     % maximum pump voltage (V)
 
 %% parameters used for SP sampling
 % SP 1
-spSample.setPoint_low = h_1_SS-1;
-spSample.setPoint_high = h_1_SS+1;
-spSample.nmberTimes = 4;
-spSample.stepLim = 0.1; % step size constraint incorporated on 2024-12-04
+spSample.setPoint_low = h_1_SS;
+spSample.setPoint_high = h_1_SS+10;
+spSample.nmberTimes = 2;
+spSample.stepLim = 4; % step size constraint incorporated on 2024-12-04
 
 % SP 2
-spSample_2.setPoint_low = h_2_SS-1; 
-spSample_2.setPoint_high = h_2_SS+1; 
-spSample_2.nmberTimes = 4;
-spSample_2.stepLim = 0.1; % step size constraint incorporated on 2024-12-04
+spSample_2.setPoint_low = h_2_SS; 
+spSample_2.setPoint_high = h_2_SS+10; 
+spSample_2.nmberTimes = 2;
+spSample_2.stepLim = 4; % step size constraint incorporated on 2024-12-04
 
 % sample SPs
 spSample.sampleTimes = randi([1,simulationTime],1,spSample.nmberTimes);
