@@ -16,7 +16,7 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1;                   % set the sample time within the MPC object
-nlobj.PredictionHorizon = 100;  % prediction horizon
+nlobj.PredictionHorizon = 10;  % prediction horizon
 nlobj.ControlHorizon = 3;       % number of steps to adjust across the horizon
 
 %% set valve positions
@@ -24,9 +24,9 @@ param.gamma1 = 0.42;     % valve position 1
 param.gamma2 = 0.42;     % valve position 2
 
 %% define parameters for model
-param.A1 = 10; % cross-sectional area (cm^2)
+param.A1 = 1; % cross-sectional area (cm^2)
 param.A3 = param.A1;
-param.A2 = 10;
+param.A2 = 1;
 param.A4 = param.A2;
 param.a1 = 0.071; % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
@@ -260,9 +260,9 @@ NLMPC_Outputs.u_CL_SIMoutput_trajectory = u_Reconstruct_CL_trajectory;
 NLMPC_Outputs.SP_SIMoutput_trajectory = SP_Reconstruct_trajectory;
 NLMPC_Outputs.Cost_SIMoutput_trajectory = Cost_trajectory;
 
-% save data
-filename = '/scratch3/20068530/NLMPC_Outputs.mat';
-save(filename,'NLMPC_Outputs',"-v7.3");
+% % save data
+% filename = '/scratch3/20068530/NLMPC_Outputs.mat';
+% save(filename,'NLMPC_Outputs',"-v7.3");
 
 %% plots
 subplot(2,1,1)
