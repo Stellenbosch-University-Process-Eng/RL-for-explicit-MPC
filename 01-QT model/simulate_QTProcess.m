@@ -6,19 +6,19 @@
 clc;clear;close all;
 
 %% define parameters for model
-param.A1 = 1;  % cross-sectional area (cm^2)
+param.A1 = 28;  % cross-sectional area (cm^2)
 param.A3 = param.A1; 
-param.A2 = 1;
+param.A2 = 32;
 param.A4 = param.A2;
 param.a1 = 0.071; % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.071;
+param.a2 = 0.057;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
-param.k1 = 3.33;     % pump 1 gain (cm^3/V)
-param.k2 = 3.33;     % pump 2 gain (cm^3/V)
-param.gamma1 = @(t) 0.42 + 0*t; % fraction opening pump 1 three-way valve (-)
-param.gamma2 = @(t) 0.42 + 0*t; % fraction opening pump 2 three-way valve (-)
+param.k1 = 3.14;     % pump 1 gain (cm^3/V)
+param.k2 = 3.29;     % pump 2 gain (cm^3/V)
+param.gamma1 = @(t) 0.01 + 0*t; % fraction opening pump 1 three-way valve (-)
+param.gamma2 = @(t) 0.01 + 0*t; % fraction opening pump 2 three-way valve (-)
 
 %% specify initial state, SP, and prediction model inputs
 v_1_SS = @(t) 3 + 0*t; % pump 1 voltage (V)

@@ -16,25 +16,25 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1;                   % set the sample time within the MPC object
-nlobj.PredictionHorizon = 10;  % prediction horizon
-nlobj.ControlHorizon = 3;       % number of steps to adjust across the horizon
+nlobj.PredictionHorizon = 50;  % prediction horizon
+nlobj.ControlHorizon = 5;       % number of steps to adjust across the horizon
 
 %% set valve positions
-param.gamma1 = 0.42;     % valve position 1
-param.gamma2 = 0.42;     % valve position 2
+param.gamma1 = 0.01;     % valve position 1
+param.gamma2 = 0.01;     % valve position 2
 
 %% define parameters for model
-param.A1 = 1; % cross-sectional area (cm^2)
+param.A1 = 28; % cross-sectional area (cm^2)
 param.A3 = param.A1;
-param.A2 = 1;
+param.A2 = 32;
 param.A4 = param.A2;
 param.a1 = 0.071; % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.071;
+param.a2 = 0.057;
 param.a4 = param.a2;
 param.g = 981;   % gravitational acceleration (cm/s^2)
-param.k1 = 3.33; % pump 1 gain (cm^3/V)
-param.k2 = 3.33; % pump 2 gain (cm^3/V)
+param.k1 = 3.14; % pump 1 gain (cm^3/V)
+param.k2 = 3.29; % pump 2 gain (cm^3/V)
 param.observedGamma1 = param.gamma1;  % fraction valve 1 opening "seen" by the MPC (2023-12-04)
 param.observedGamma2 = param.gamma2;  % fraction valve 2 opening "seen" by the MPC (2023-12-04)
 
