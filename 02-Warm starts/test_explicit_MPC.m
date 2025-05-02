@@ -9,7 +9,7 @@ rng(1)
 tic 
 
 %% load policy data
-load("policy_data_gamma_0Point42_numLevels_6.mat");
+load("policy_data_gamma_001_numlevels_5.mat");
 
 %% set decay rate for valve positions
 param.gamma1 = policy_data.gamma_val;    % valve 1 fraction opening
@@ -24,17 +24,17 @@ NN.linearActM = 1;
 net = policy_data.pol_net;
 
 %% define parameters for model
-param.A1 = 10;      % cross-sectional area (cm^2)
+param.A1 = 28;      % cross-sectional area (cm^2)
 param.A3 = param.A1;
-param.A2 = 10;
+param.A2 = 32;
 param.A4 = param.A2;
 param.a1 = 0.071;   % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.071;
+param.a2 = 0.057;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
-param.k1 = 3.33;     % pump 1 gain (cm^3/V)
-param.k2 = 3.33;     % pump 2 gain (cm^3/V)
+param.k1 = 3.14;     % pump 1 gain (cm^3/V)
+param.k2 = 3.29;     % pump 2 gain (cm^3/V)
 
 %% specify initial state, SP, and prediction model inputs
 v_1_SS = 3.15;
@@ -60,7 +60,7 @@ u0 = [v_1_SS,v_2_SS]'; % nominal inputs to the model
 SP = [h_1_SS,h_2_SS,0,0]; % set point
 
 %% simulate closed-loop control under non-linear MPC
-simulationTime = 1000;%50000;      % number of time steps to simulate
+simulationTime = 50000;      % number of time steps to simulate
 x_CL_trajectory = x0';       % initialize liquid height trajectory 
 u_CL_trajectory = u0';       % initialize MV trajectory
 SP_trajectory = SP;          % initialize SP trajectory
@@ -71,16 +71,16 @@ Limits.u_upper = 30;     % maximum pump voltage (V)
 
 %% parameters used for SP sampling
 % SP 1
-spSample.setPoint_low = h_1_SS;
-spSample.setPoint_high = h_1_SS+10;
-spSample.nmberTimes = 2;
-spSample.stepLim = 4; % step size constraint incorporated on 2024-12-04
+spSample.setPoint_low = 20;
+spSample.setPoint_high = 30;
+spSample.nmberTimes = 10;
+spSample.stepLim = 10; % step size constraint incorporated on 2024-12-04
 
 % SP 2
-spSample_2.setPoint_low = h_2_SS; 
-spSample_2.setPoint_high = h_2_SS+10; 
-spSample_2.nmberTimes = 2;
-spSample_2.stepLim = 4; % step size constraint incorporated on 2024-12-04
+spSample_2.setPoint_low = 20; 
+spSample_2.setPoint_high = 30; 
+spSample_2.nmberTimes = 10;
+spSample_2.stepLim = 10; % step size constraint incorporated on 2024-12-04
 
 % sample SPs
 spSample.sampleTimes = randi([1,simulationTime],1,spSample.nmberTimes);
