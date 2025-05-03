@@ -96,8 +96,8 @@ nmberTspanEntries = 100;
 Ts = 1; % sampling period
 
 %% preprocessing- and postprocessing data
-PS_input = policy_data.state_scaling;
-PS_targets = policy_data.action_scaling;
+PS_input = policy_data.PS_input;
+PS_targets = policy_data.PS_targets;
 
 for currentTimeStamp = 1:1:(simulationTime/Ts)
 
