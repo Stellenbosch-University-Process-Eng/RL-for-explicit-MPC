@@ -12,6 +12,10 @@ tic % start measuring wall time
 %% start parallel pool, 2022-10-17
 myPool = parpool('local'); 
 
+%% load policy and value function data
+load('policy_data_gamma_001_numlevels_5.mat');
+load('value_data_gamma_001_numlevels_5.mat');
+
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
 nmberStepsSpecified = 1000;
@@ -36,35 +40,21 @@ for scenarioCntr = 1:1:numberScenarios
     param.satPenaltyMagnitude = 0.2;    % magnitude of penalty for saturating the final element (2023-05-03)
     
     %% load warm-starting policy (2023-06-14)
-    filename_warm_policy = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_NN_Policy.mat";
-    B = load(filename_warm_policy);
-    actor.NN = B.NN; % 2023-02-08
+    actor.NN = policy_data.NN; % 2023-02-08
     actor.NN.linearActM = 1;                    % gradient of linear output activation function (2023-01-17)
     actor.NN.stdDev_defined = 0.06;              % standard deviation used when sampling exploratory actions (2023-01-17)
     actor.NN.activation_type = 1;               % activation type of output layer set as linear (2023-01-17)
     actor.NN.k_hidden_warm = actor.NN.k_hidden; % define "actor.NN.k_hidden_warm" for use in the function "evaluateRBFhiddenlayer_001" (2023-10-10)
     
     %% load critic network
-    filename_critic_warm_start = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_NN_Value_trainbr.mat";
-
-    C = load(filename_critic_warm_start);
-    critic.NN = C.NN;
+    critic.NN = value_data.NN;
     critic.NN.alpha = 0.5; % critic learning rate
     
-    %% specify paths for preprocessing- and postprocessing data (2023-11-27)
-    filename_state_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_state_scaling_data.mat"; % state scaling
-    filename_control_input_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_action_scaling_data.mat"; % control input scaling 
-    filename_state_value_scaling_structure = "C:\Users\Edward\Stellenbosch University\Machine Learning at Process Engineering - Edward Bras (1)\Code\PhD code\12-Article 2\00-Data\03-Runs with warm-started critic\01-Non-minimum phase region\P_-_value_scaling_data_trainbr.mat"; % state-value scaling
-
-    %% load preprocessing- and postprocessing data
-    load(filename_state_scaling_structure); % load state scaling data
-    load(filename_control_input_scaling_structure); % load control input scaling data
-    load(filename_state_value_scaling_structure); % load state-value scaling data
-    
-    % store data processing structures as fields of the structure "p".
-    param.PS_input = PS_input; 
-    param.PS_targets = PS_targets;
-    param.PS_Value_targets = PS_Value_targets;
+    %% load preprocessing- and postprocessing data and store data processing 
+    %% structures as fields of the structure "p".
+    param.PS_input = policy_data.PS_input; 
+    param.PS_targets = policy_data.PS_targets;
+    param.PS_Value_targets = value_data.PS_Value_targets;
     
     %% initialize average reward and relevant learning rate (2023-06-29)
     param.avgRAlpha = 0.9;     % learning rate used to update the average reward (2023-06-29)
@@ -218,8 +208,8 @@ test_results.Experience = all_scenarios_out_Experience; % save experience genera
 test_results.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
 test_results.logging.model_parameters = param;          % save dynamic model's parameters
 
-filename = '/scratch3/20068530/test_results';
-save(filename,'test_results',"-v7.3");
+% filename = '/scratch3/20068530/test_results';
+% save(filename,'test_results',"-v7.3");
 
 toc % moved 2022-10-17
 
