@@ -112,7 +112,7 @@ plotregression(trTargets,trOut,'Train',valTargets,valOut,'Validation',testingTar
 %% store trained NN and scaling data
 policy_data.NN = NN; % NN structure
 policy_data.pol_net = net; % NN object
-policy_data.state_scaling = PS_input; % state scaling
-policy_data.action_scaling = PS_targets; % action scaling
+policy_data.PS_input = PS_input; % state scaling
+policy_data.PS_targets = PS_targets; % action scaling
 policy_data.gamma_val = gamma_val; % valve fraction opening
 policy_data.numLevels = numLevels; % number of SP levels
