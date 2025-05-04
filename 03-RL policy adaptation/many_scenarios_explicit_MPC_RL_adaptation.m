@@ -93,7 +93,7 @@ for scenarioCntr = 1:1:numberScenarios
     %% simulate the non-linear process model
     final_time = 1e6;
     tspan = linspace(0,final_time,final_time); % time span (s)
-    [~,Output] = ode23s(@(t,x) QTProcess_NL_determine_SS(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);
+    [~,Output] = ode23s(@(t,x) myQTDEs(t,x,param,[v_1_SS,v_2_SS]),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);
     
     %% save steady states
     h_1_SS = Output(end,1);
@@ -500,21 +500,4 @@ end
 % function used to update the average reward (2023-06-29)
 function p = updateAverageReward(p,temporal_diff)
     p.avgR = p.avgR + p.avgRAlpha*temporal_diff; % update for average reward (2023-06-29)
-end
-
-%% non-linear dynamic model used to calculate initial steady-state liquid heights
-function dHdt = QTProcess_NL_determine_SS(t,x,param,v_1,v_2)
-% Function that contains the differential equations for the non-linear
-% Quadruple Tank benchmark process.
-% x(1) = h1
-% x(2) = h2
-% x(3) = h3
-% x(4) = h4
-dh1dt = ( -1*param.a1*sqrt(2*param.g*x(1)) + param.a3*sqrt(2*param.g*x(3)) + param.gamma1*param.k1*v_1 )/param.A1;
-dh2dt = ( -1*param.a2*sqrt(2*param.g*x(2)) + param.a4*sqrt(2*param.g*x(4)) + param.gamma2*param.k2*v_2 )/param.A2;
-dh3dt = ( -1*param.a3*sqrt(2*param.g*x(3)) + (1-param.gamma2)*param.k2*v_2 )/param.A3;
-dh4dt = ( -1*param.a4*sqrt(2*param.g*x(4)) + (1-param.gamma1)*param.k1*v_1 )/param.A4;
-
-dHdt = [dh1dt,dh2dt,dh3dt,dh4dt]';
-
 end
