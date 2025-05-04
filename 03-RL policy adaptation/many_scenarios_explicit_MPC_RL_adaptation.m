@@ -25,15 +25,16 @@ numberScenarios = 2;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
-    param.Gradient = 1e-20;%1e-6;%1e-20; % (2023-11-08)
-    param.startTime = 0;    % (2023-11-08)
-%     param.initial_gammas = 0.6;%0.4; % (2023-11-09)
-%     param.offset = -1*param.startTime + (log(param.initial_gammas)/(-1*param.Gradient)); % (2023-11-08)
-%     param.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
+    gammaSpecs.gamma_vec_start = 0;
+    gammaSpecs.gamma_vec_end = nmberStepsSpecified;
+    gammaSpecs.gamma_final = 0.1;
+    gammaSpecs.initial_gammas = 0.01; % (2023-11-09)
     
-%     t_vec = linspace(0,2e6,2e6);%zeros(1,1000);   
-%     param.gamma_vec = param.initial_gammas;%((0.23-param.initial_gammas)/(2e6))*t_vec + param.initial_gammas; 
-%     param.gamma_vec = repelem(param.gamma_vec,param.rateRepeat);
+    gammaSpecs.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
+    
+    t_vec = linspace(gammaSpecs.gamma_vec_start,gammaSpecs.gamma_vec_end,gammaSpecs.gamma_vec_end);   
+    param.gamma_vec = ((gammaSpecs.gamma_final-gammaSpecs.initial_gammas)/(nmberStepsSpecified))*t_vec + gammaSpecs.initial_gammas; 
+    param.gamma_vec = repelem(param.gamma_vec,gammaSpecs.rateRepeat);
     
     %% saturation penalty settings (2023-05-03)
     param.includeSaturationPenalty = 0; % if = 1, agent penalized for saturating the final element.  if = 0, agent is not penalized (2023-05-03)
