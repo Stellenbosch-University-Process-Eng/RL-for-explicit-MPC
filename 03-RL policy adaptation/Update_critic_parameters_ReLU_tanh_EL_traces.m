@@ -2,9 +2,7 @@
 %% output layer activation.  Eligibility traces used to
 %% incorporate previous gradient information.
 function [NN,p] = Update_critic_parameters_ReLU_tanh_EL_traces(NN,State_1,State_2,State_3,State_4,State_5,State_6,delta_Lnj,temporal_diff,yrnj,z_rnj_hidden,p)
-    % Section below changed on 2023-11-27 to correspond to
-    % actor-critic update rule with sigmoidal hidden layer
-    % activation.
+
     % loop through the neurons in the hidden layer
     for j_hidden_bw = 1:1:NN.k_hidden
         %% add backward computation
@@ -56,7 +54,7 @@ function [NN,p] = Update_critic_parameters_ReLU_tanh_EL_traces(NN,State_1,State_
         NN.output_layer_parameters(:,j_output_update) = NN.output_layer_parameters(:,j_output_update) + ...
             dThetaLnj(:,j_output_update);
     
-    end % end update of output parameters
+    end % end update of output layer parameters
     
     
     % update hidden layer parameters
@@ -82,4 +80,4 @@ function [NN,p] = Update_critic_parameters_ReLU_tanh_EL_traces(NN,State_1,State_
         
     end % end update of hidden layer parameters
 
-end
+end % end backpropagation function

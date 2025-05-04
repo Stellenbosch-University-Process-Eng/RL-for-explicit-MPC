@@ -30,7 +30,7 @@ function [yrnj_output,z_rnj_hidden,yrnj,z_rnj_outer] = evaluate_ReLU_tanh_six_st
     end % end loop through the neurons in the hidden layer
     
         % loop through the neurons in the output layer
-        for j_output_fw = 1:1:1%NN.k_output
+        for j_output_fw = 1:1:1
             %% add forward computations
             % compute the output of the linear combiner at the jth
             % neuron in layer r at time instant (training sample) n

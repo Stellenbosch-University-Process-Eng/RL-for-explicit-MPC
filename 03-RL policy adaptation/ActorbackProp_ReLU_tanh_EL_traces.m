@@ -11,7 +11,7 @@ function [NN,p] = ActorbackProp_ReLU_tanh_EL_traces(NN,State_1,State_2,State_3,S
 
     % BACKWARD PASS BEGIN
     % loop though the neurons in the output layer
-    for j_output_bw = 1:1:1%NN.k_output
+    for j_output_bw = 1:1:1
         %% add backward computation
         % calculate the derivative of the activation function
         % evaluated at the output of the linear combiner of the
@@ -36,9 +36,6 @@ function [NN,p] = ActorbackProp_ReLU_tanh_EL_traces(NN,State_1,State_2,State_3,S
 
     end % end backward pass through output layer 
 
-            % Section below changed on 2023-11-27 to correspond to
-            % actor-critic update rule with sigmoidal hidden layer
-            % activation.
             % loop through the neurons in the hidden layer
             for j_hidden_bw = 1:1:NN.k_hidden
                 %% add backward computation
@@ -92,7 +89,7 @@ function [NN,p] = ActorbackProp_ReLU_tanh_EL_traces(NN,State_1,State_2,State_3,S
                 NN.output_layer_parameters(:,j_output_update) = NN.output_layer_parameters(:,j_output_update) + ...
                     dThetaLnj(:,j_output_update);
         
-            end % end update of output parameters
+            end % end update of output layer parameters
 
             
             % update hidden layer parameters

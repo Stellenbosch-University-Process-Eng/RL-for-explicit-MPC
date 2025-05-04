@@ -30,7 +30,7 @@ function [yrnj_output,yrnj_output_NODE_TWO,z_rnj_hidden,yrnj,z_rnj_outer,z_rnj_o
     end % end loop through the neurons in the hidden layer
     
         % loop through the neurons in the output layer
-        for j_output_fw = 1:1:1%NN.k_output
+        for j_output_fw = 1:1:1
             %% add forward computations
             % compute the output of the linear combiner at the jth
             % neuron in layer r at time instant (training sample) n
@@ -41,7 +41,7 @@ function [yrnj_output,yrnj_output_NODE_TWO,z_rnj_hidden,yrnj,z_rnj_outer,z_rnj_o
             % compute the output after passing the result though
             % the activation function 
             yrnj_output = tanh(z_rnj_outer); % tanh activation of node 1
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
             % repeat calculations for the second output node,
             % 2023-02-22
             z_rnj_outer_NODE_TWO(j_output_fw) = ...
@@ -49,7 +49,7 @@ function [yrnj_output,yrnj_output_NODE_TWO,z_rnj_hidden,yrnj,z_rnj_outer,z_rnj_o
                 [1;( yrnj(1:1:NN.k_hidden) )'];
             
             yrnj_output_NODE_TWO = tanh(z_rnj_outer_NODE_TWO); % tanh activation of node 2
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
     
         end % end loop through the neurons in the output layer
     
