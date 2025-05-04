@@ -18,7 +18,7 @@ load('value_data_gamma_001_numlevels_5.mat');
 
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
-nmberStepsSpecified = 1000;
+nmberStepsSpecified = 20000;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
 numberScenarios = 2;
@@ -42,7 +42,7 @@ for scenarioCntr = 1:1:numberScenarios
     %% load warm-starting policy (2023-06-14)
     actor.NN = policy_data.NN; % 2023-02-08
     actor.NN.linearActM = 1;                    % gradient of linear output activation function (2023-01-17)
-    actor.NN.stdDev_defined = 0.06;              % standard deviation used when sampling exploratory actions (2023-01-17)
+    actor.NN.stdDev_defined = 0.05;%0.06;              % standard deviation used when sampling exploratory actions (2023-01-17)
     actor.NN.activation_type = 1;               % activation type of output layer set as linear (2023-01-17)
     actor.NN.k_hidden_warm = actor.NN.k_hidden; % define "actor.NN.k_hidden_warm" for use in the function "evaluateRBFhiddenlayer_001" (2023-10-10)
     
@@ -70,17 +70,17 @@ for scenarioCntr = 1:1:numberScenarios
     %% define parameters for model
     param.A1 = 28;  % cross-sectional area (cm^2)
     param.A3 = param.A1; 
-    param.A2 = 28;
+    param.A2 = 32;
     param.A4 = param.A2;
     param.a1 = 0.071; % cross-section of tank outlet (cm^2)
     param.a3 = param.a1;
-    param.a2 = 0.071;
+    param.a2 = 0.057;
     param.a4 = param.a2;
     param.g = 981;          % gravitational acceleration (cm/s^2)
     param.k1 = 3.14;        % pump 1 gain (cm^3/V)
     param.k2 = 3.29;        % pump 2 gain (cm^3/V)
-    param.gamma1 = 0.43;    % fraction opening pump 1 three-way valve (-)
-    param.gamma2 = 0.34;    % fraction opening pump 2 three-way valve (-)
+    param.gamma1 = 0.2;    % fraction opening pump 1 three-way valve (-)
+    param.gamma2 = 0.2;    % fraction opening pump 2 three-way valve (-)
     
     %% specify initial state, SP, and prediction model inputs
     v_1_SS = 3.15;          % pump voltage (V)
@@ -117,12 +117,12 @@ for scenarioCntr = 1:1:numberScenarios
     % SP 1
     spSample.setPoint_low = 20;%h_1_SS; 
     spSample.setPoint_high = 30;%h_1_SS; 
-    spSample.nmberTimes = 10;%50;
+    spSample.nmberTimes = 6;%50;
     
     % SP 2
     spSample.setPoint_low_2 = 20;%h_2_SS;
     spSample.setPoint_high_2 = 30;%h_2_SS; 
-    spSample.nmberTimes_2 = 10;%50;
+    spSample.nmberTimes_2 = 6;%50;
     
     % sample SPs
     spSample.sampleTimes = randi([1,param.nmberOfSteps],1,spSample.nmberTimes);
@@ -133,7 +133,7 @@ for scenarioCntr = 1:1:numberScenarios
     spSample.SP_samples_2 = spSample.setPoint_low_2 + (spSample.setPoint_high_2 - spSample.setPoint_low_2)*rand(1,spSample.nmberTimes_2);
      
     %% initialize counters and levels for the step size parameter (2022-10-17)
-    StepSizes.nmberOfStepSizeLevels = 4;    % number of step size levels to consider, 2022-10-17
+    StepSizes.nmberOfStepSizeLevels = 10;    % number of step size levels to consider, 2022-10-17
     StepSizes.low_stepSizeBound = 0;        % lower bound for step sizes, 2022-10-17
     StepSizes.high_stepSizeBound = 3.33e-4; % upper bound for step sizes, 2022-10-17
     StepSizes.hyperparameterValues = linspace(StepSizes.low_stepSizeBound,StepSizes.high_stepSizeBound,StepSizes.nmberOfStepSizeLevels); % step sizes at which to conduct training, 2022-10-17
