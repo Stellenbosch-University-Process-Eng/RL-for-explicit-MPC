@@ -297,7 +297,7 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
             %% scale observed states (2023-11-27)
             [InputsScaled,~] = mapminmax('apply',[State_1(currentTimeStamp),State_2(currentTimeStamp),State_3(currentTimeStamp),State_4(currentTimeStamp),State_5(currentTimeStamp),State_6(currentTimeStamp)]',p.PS_input); % scale inputs
             
-            % scaeld states for the current time step (2023-12-14)
+            % scaled states for the current time step (2023-12-14)
             S_1_s = InputsScaled(1); % SP 1 scaled
             S_2_s = InputsScaled(2); % SP 2 scaled
             S_3_s = InputsScaled(3); % H1 scaled
@@ -386,8 +386,8 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
             %% store training data
             out_agentExperience.avgR(stepCntr) = p.avgR; % average reward (2023-06-29)
             out_agentExperience.R(stepCntr) = R;
-            out_agentExperience.S1_sqrd_dev(stepCntr) = (S_1_s_nxt - S_3_s_nxt )^2; % squared deviation from SP 1
-            out_agentExperience.S2_sqrd_dev(stepCntr) = (S_2_s_nxt - S_4_s_nxt )^2; % squared deviation from SP 2
+            out_agentExperience.S1_sqrd_dev(stepCntr) = (nxtState_1(currentTimeStamp) - nxtState_3(currentTimeStamp) )^2; % squared deviation from SP 1
+            out_agentExperience.S2_sqrd_dev(stepCntr) = (nxtState_2(currentTimeStamp) - nxtState_4(currentTimeStamp) )^2; % squared deviation from SP 2
             out_agentExperience.State_1(stepCntr) = State_1(currentTimeStamp);
             out_agentExperience.State_2(stepCntr) = State_2(currentTimeStamp);
             out_agentExperience.State_3(stepCntr) = State_3(currentTimeStamp); % 2023-06-04
@@ -434,7 +434,7 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
 
     end % end loop through episodes
 
-end
+end % end function
 
 % function to scale reward to a value between 0 and 1
 function reward_scaled = scaleRewards(R,R_bounds)
