@@ -44,20 +44,20 @@ for scenarioCntr = 1:1:numberScenarios
     actor.NN.linearActM = 1;                    % gradient of linear output activation function (2023-01-17)
     actor.NN.stdDev_defined = 0.05;%0.06;              % standard deviation used when sampling exploratory actions (2023-01-17)
     actor.NN.activation_type = 1;               % activation type of output layer set as linear (2023-01-17)
-    actor.NN.k_hidden_warm = actor.NN.k_hidden; % define "actor.NN.k_hidden_warm" for use in the function "evaluateRBFhiddenlayer_001" (2023-10-10)
+    actor.NN.k_hidden_warm = actor.NN.k_hidden; % define "actor.NN.k_hidden_warm" for use in network evaluation function (2023-10-10)
     
     %% load critic network
     critic.NN = value_data.NN;
     critic.NN.alpha = 0.5; % critic learning rate
     
     %% load preprocessing- and postprocessing data and store data processing 
-    %% structures as fields of the structure "p".
+    %% structures as fields of the parameter structure
     param.PS_input = policy_data.PS_input; 
     param.PS_targets = policy_data.PS_targets;
     param.PS_Value_targets = value_data.PS_Value_targets;
     
     %% initialize average reward and relevant learning rate (2023-06-29)
-    param.avgRAlpha = 0.9;     % learning rate used to update the average reward (2023-06-29)
+    param.avgRAlpha = 0.5;     % learning rate used to update the average reward (2023-06-29)
     param.avgR = 0;            % initialize average reward (2023-06-29)
     
     %% set interval between reported step numbers (2023-06-30)
@@ -79,8 +79,8 @@ for scenarioCntr = 1:1:numberScenarios
     param.g = 981;          % gravitational acceleration (cm/s^2)
     param.k1 = 3.14;        % pump 1 gain (cm^3/V)
     param.k2 = 3.29;        % pump 2 gain (cm^3/V)
-    param.gamma1 = 0.2;    % fraction opening pump 1 three-way valve (-)
-    param.gamma2 = 0.2;    % fraction opening pump 2 three-way valve (-)
+    param.gamma1 = 0.1;    % fraction opening pump 1 three-way valve (-)
+    param.gamma2 = 0.1;    % fraction opening pump 2 three-way valve (-)
     
     %% specify initial state, SP, and prediction model inputs
     v_1_SS = 3.15;          % pump voltage (V)
@@ -102,7 +102,7 @@ for scenarioCntr = 1:1:numberScenarios
     h_4_SS = Output(end,4);
     
     param.x0 = [h_1_SS,h_2_SS,h_3_SS,h_4_SS]'; % nominal states
-    param.u0 = [3,3]'; % nominal inputs to the model
+    param.u0 = [v_1_SS,v_2_SS]'; % nominal inputs to the model
     param.SP = [h_1_SS,h_2_SS];% set points (2023-11-17)
     
     %% RL agent training settings
@@ -115,23 +115,25 @@ for scenarioCntr = 1:1:numberScenarios
     
     %% parameters used for SP sampling
     % SP 1
-    spSample.setPoint_low = 20;%h_1_SS; 
-    spSample.setPoint_high = 30;%h_1_SS; 
-    spSample.nmberTimes = 6;%50;
+    spSample.setPoint_low = 20; 
+    spSample.setPoint_high = 30; 
+    spSample.nmberTimes = 6;
+    spSample.stepLim = 10; % step size constraint incorporated on 2024-12-04
     
     % SP 2
-    spSample.setPoint_low_2 = 20;%h_2_SS;
-    spSample.setPoint_high_2 = 30;%h_2_SS; 
-    spSample.nmberTimes_2 = 6;%50;
+    spSample_2.setPoint_low = 20;  
+    spSample_2.setPoint_high = 30; 
+    spSample_2.nmberTimes = 6;
+    spSample_2.stepLim = 10; % step size constraint incorporated on 2024-12-04
     
     % sample SPs
-    spSample.sampleTimes = randi([1,param.nmberOfSteps],1,spSample.nmberTimes);
-    spSample.SP_samples = spSample.setPoint_low + (spSample.setPoint_high - spSample.setPoint_low)*rand(1,spSample.nmberTimes);
+    spSample.sampleTimes = randi([1,nmberStepsSpecified],1,spSample.nmberTimes);
+    spSample = quadruple_tank_step_constrained_SP_sampling(spSample,[param.x0(1),param.x0(2)],1);
     
     % sample SP 2 (2023-11-26)
-    spSample.sampleTimes_2 = randi([1,param.nmberOfSteps],1,spSample.nmberTimes_2);
-    spSample.SP_samples_2 = spSample.setPoint_low_2 + (spSample.setPoint_high_2 - spSample.setPoint_low_2)*rand(1,spSample.nmberTimes_2);
-     
+    spSample_2.sampleTimes = randi([1,nmberStepsSpecified],1,spSample_2.nmberTimes);
+    spSample_2 = quadruple_tank_step_constrained_SP_sampling(spSample_2,[param.x0(1),param.x0(2)],2);
+
     %% initialize counters and levels for the step size parameter (2022-10-17)
     StepSizes.nmberOfStepSizeLevels = 10;    % number of step size levels to consider, 2022-10-17
     StepSizes.low_stepSizeBound = 0;        % lower bound for step sizes, 2022-10-17
@@ -167,7 +169,7 @@ for scenarioCntr = 1:1:numberScenarios
     %% train the agents
     parfor hyperparameterCntr = 1:StepSizes.nmberOfStepSizeLevels
         [example_agentExperience,example_Policy,example_traces,example_Critic] = trainFunction(actor,critic,...
-            param,R_bounds,spSample,...
+            param,R_bounds,spSample,spSample_2,...
             StepSizes.hyperparameterValues(hyperparameterCntr));
         out_Policies(hyperparameterCntr) = example_Policy;
         out_Critics(hyperparameterCntr) = example_Critic; % store value function 2023-01-16
@@ -216,7 +218,7 @@ toc % moved 2022-10-17
 %% functions 
 % training function
 function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
-    critic,p,R_bounds,spSample,stepSize) % changed to function on 2022-10-17
+    critic,p,R_bounds,spSample,spSample_2,stepSize) % changed to function on 2022-10-17
     actor.NN.alpha = stepSize; % initialize step size level (2022-10-17)
     for epCntr = 1:1:1 % start loop through episodes (outer loop of earlier code maintained, but there are no episodes here)
         currentTimeStamp = 1; % initialize time stamp
@@ -256,15 +258,15 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
             end
 
             % sample H2 SP (2023-11-17)
-            for j = 1:1:size(spSample.sampleTimes_2,2)
-                if spSample.sampleTimes_2(j) == currentTimeStamp
-                    p.SP(2) = spSample.SP_samples_2(j);
+            for j = 1:1:size(spSample_2.sampleTimes,2)
+                if spSample_2.sampleTimes(j) == currentTimeStamp
+                    p.SP(2) = spSample_2.SP_samples(j);
                     State_2(currentTimeStamp) = p.SP(2); % current SP (2023-06-04)
                 end
                 % determine the SP at the next time step (next state 3)
                 % (2023-06-04)
-                if spSample.sampleTimes_2(j) == currentTimeStamp + 1
-                    true_nxtState_2(currentTimeStamp) = spSample.SP_samples_2(j); % assign next SP as the next state 3 (2023-06-04)
+                if spSample_2.sampleTimes(j) == currentTimeStamp + 1
+                    true_nxtState_2(currentTimeStamp) = spSample_2.SP_samples(j); % assign next SP as the next state 3 (2023-06-04)
                 else
                     true_nxtState_2(currentTimeStamp) = p.SP(2); % updated 2023-06-04
                 end
