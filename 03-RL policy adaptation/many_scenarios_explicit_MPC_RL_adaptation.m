@@ -93,7 +93,7 @@ for scenarioCntr = 1:1:numberScenarios
     %% simulate the non-linear process model
     final_time = 1e6;
     tspan = linspace(0,final_time,final_time); % time span (s)
-    [~,Output] = ode23s(@(t,x) QTProcess_NL_const_time(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);
+    [~,Output] = ode23s(@(t,x) QTProcess_NL_determine_SS(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);
     
     %% save steady states
     h_1_SS = Output(end,1);
@@ -347,7 +347,7 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
             simTspan = linspace(start,stop,100); % (2023-11-06)
 
             %% simulate the RL environment dynamics (2023-11-06)
-            [~,control_output] = ode23s(@(t,x) myQTPDEs(t,x,p,[p.u_1,p.u_2]),simTspan,[State_3(currentTimeStamp),State_4(currentTimeStamp),State_5(currentTimeStamp),...
+            [~,control_output] = ode23s(@(t,x) myQTDEs(t,x,p,[p.u_1,p.u_2]),simTspan,[State_3(currentTimeStamp),State_4(currentTimeStamp),State_5(currentTimeStamp),...
                 State_6(currentTimeStamp)]'); % (UPDATED STATES SENT TO ODE SOLVER TO ACCOMMODATE SEPARATE H1 AND H2 SPs ON 2023-11-17)
 
             %% next states (2023-11-06)
@@ -443,7 +443,7 @@ function reward_scaled = scaleRewards(R,R_bounds)
 end
 
 % QTP model for call to DE solver (2023-11-06)
-function dHdt = myQTPDEs(t,x,param,u)
+function dHdt = myQTDEs(t,x,param,u)
     % Function that contains the differential equations for the non-linear
     % Quadruple Tank benchmark process.
     % x(1) = h1
@@ -460,7 +460,7 @@ function dHdt = myQTPDEs(t,x,param,u)
 end
 
 %% FUNCTIONS FOR NN CRITIC
-% backpropagation function for actor
+% critic backpropagation
 function [NN,temporal_diff,p] = RBF_TD_0(NN,State_1,State_2,State_3,State_4,State_5,State_6,nxtState_1,nxtState_2,nxtState_3,nxtState_4,nxtState_5,nxtState_6,p,R) % 2023-01-17 (updated 2023-11-17)
 
     [temporal_diff,yrnj,p,z_rnj_hidden,z_rnj_output] = calculateTemporalDiff(NN,p,State_1,State_2,State_3,State_4,State_5,State_6,nxtState_1,nxtState_2,nxtState_3,nxtState_4,nxtState_5,nxtState_6,R); % calculate the current temporal difference (2023-05-24)
@@ -503,7 +503,7 @@ function p = updateAverageReward(p,temporal_diff)
 end
 
 %% non-linear dynamic model used to calculate initial steady-state liquid heights
-function dHdt = QTProcess_NL_const_time(t,x,param,v_1,v_2)
+function dHdt = QTProcess_NL_determine_SS(t,x,param,v_1,v_2)
 % Function that contains the differential equations for the non-linear
 % Quadruple Tank benchmark process.
 % x(1) = h1
