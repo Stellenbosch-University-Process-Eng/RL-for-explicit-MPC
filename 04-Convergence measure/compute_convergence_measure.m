@@ -3,7 +3,23 @@
 %% Name: Edward Bras
 %% Date: 2025-05-05
 clc;clear;
-%%
+
+tic 
+
+%% load saved data
+load('Exp_many_scenarios.mat');      % load all measured states during RL training
+load('Policies_many_scenarios.mat'); % load policies generated during RL training
+load('par_many_scenarios.mat');      % load parameters (including state- and action scaling structures)
+
+%% determine parameters required to process stored training data
+numProbs = size(all_scenarios_out_Experience,1); % number of control problems
+num_k = size(all_scenarios_out_Experience{1,1}(1).State_1,2); % number of discrete time steps
+num_RL_policies = size(all_scenarios_out_Policies{1,1}(1).NN,2); % number of policies saved
+num_steps_skip = num_k/num_RL_policies; % number of time steps between successive policies
+policy_times_vec = num_steps_skip:num_steps_skip:num_k; % vector of time steps for which policies
+
+numStates = 6;  % number of observed RL states (SP1,SP2,H1,H2,H3,H4)
+numActions = 2; % number of actions applied to the RL environment
 
 %% specifying size of the problem
 nx = 4; % states
@@ -14,23 +30,23 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1;                           % set the sample time within the MPC object
-nlobj.PredictionHorizon = 50;          % prediction horizon
-nlobj.ControlHorizon = 20;               % number of steps to adjust across the horizon
+nlobj.PredictionHorizon = 10;          % prediction horizon
+nlobj.ControlHorizon = 5;               % number of steps to adjust across the horizon
 
 %% define parameters for model
 param.A1 = 28;      % cross-sectional area (cm^2)
 param.A3 = param.A1;
-param.A2 = 32;
+param.A2 = 28;
 param.A4 = param.A2;
 param.a1 = 0.071;   % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.057;
+param.a2 = 0.071;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
-param.k1 = 3.14;     % pump 1 gain (cm^3/V)
-param.k2 = 3.29;     % pump 2 gain (cm^3/V)
-param.gamma1 = 0.01;%0.42; % fraction opening pump 1 three-way valve (-)
-param.gamma2 = 0.01;%0.42; % fraction opening pump 2 three-way valve (-)
+param.k1 = 2;     % pump 1 gain (cm^3/V)
+param.k2 = 2;     % pump 2 gain (cm^3/V)
+param.gamma1 = 0.6; % fraction opening pump 1 three-way valve (-)
+param.gamma2 = 0.6; % fraction opening pump 2 three-way valve (-)
 
 %% specifying dynamic model
 % https://www.mathworks.com/help/mpc/ug/specify-prediction-model-for-nonlinear-mpc.html
@@ -138,6 +154,105 @@ for cntr = 1:1:( size(Info_OL.Xopt,1) - 1 )
     X_1_OL_traj(cntr) = Info_OL.Xopt(cntr+1,1);
     X_2_OL_traj(cntr) = Info_OL.Xopt(cntr+1,2);
 end
+
+%% compute r.r
+states_array = nan(numStates,numProbs,num_RL_policies); % initialise array containing all states for which RL policies are available
+MPC_actions_array = nan(numProbs,num_RL_policies,numActions); % initialise array containing all MPC actions
+RL_actions_array = MPC_actions_array; % initialise array containing all RL agent actions
+
+% populate array containing the coordinates in state space corresponding to
+% the observations made during RL agent training for each of the saved
+% actor networks.
+for probCntr = 1:1:numProbs
+    states_array(1,probCntr,:) = all_scenarios_out_Experience{probCntr,1}(end).State_1(policy_times_vec);
+    states_array(2,probCntr,:) = all_scenarios_out_Experience{probCntr,1}(end).State_2(policy_times_vec);
+    states_array(3,probCntr,:) = all_scenarios_out_Experience{probCntr,1}(end).State_3(policy_times_vec);
+    states_array(4,probCntr,:) = all_scenarios_out_Experience{probCntr,1}(end).State_4(policy_times_vec);
+    states_array(5,probCntr,:) = all_scenarios_out_Experience{probCntr,1}(end).State_5(policy_times_vec);
+    states_array(6,probCntr,:) = all_scenarios_out_Experience{probCntr,1}(end).State_6(policy_times_vec);
+
+end % end loop through number of problems
+
+% determine MPC and RL actions
+for probCntr = 1:1:numProbs
+    for numPolCntr = 1:1:num_RL_policies
+        SP(1) = states_array(1,probCntr,numPolCntr);
+        SP(2) = states_array(2,probCntr,numPolCntr);
+
+        x_k(1) = states_array(3,probCntr,numPolCntr);
+        x_k(2) = states_array(4,probCntr,numPolCntr);
+        x_k(3) = states_array(5,probCntr,numPolCntr);
+        x_k(4) = states_array(6,probCntr,numPolCntr);
+
+        % provide initial control input
+        if numPolCntr == 1
+            u_k = u0;
+        else
+            u_k = [Info.MVopt(1,1),Info.MVopt(1,2)]';
+        end
+
+        % compute MPC action
+        [~,~,Info] = nlmpcmove(nlobj,x_k,u_k,SP,[],nloptions);
+        MPC_actions_array(probCntr,numPolCntr,1) = Info.MVopt(1,1); % control action 1
+        MPC_actions_array(probCntr,numPolCntr,2) = Info.MVopt(1,2); % control action 2
+
+        % calculate RL action
+        % scale states
+        PS_input = all_scenarios_p_outputs{probCntr,1}(end).PS_input;
+        [InputsScaled,~] = mapminmax('apply',[SP(1),SP(2),x_k(1),x_k(2),x_k(3),x_k(4)]',PS_input); % scale inputs
+
+        % evaluate neural network (2023-11-26)
+        NN = all_scenarios_out_Policies{probCntr,1}(end).NN{1,numPolCntr};
+        [u_opt_1_s,u_opt_2_s,~,~] = evaluate_ReLU_tanh_six_states(NN,InputsScaled(1),InputsScaled(2),InputsScaled(3),InputsScaled(4),InputsScaled(5),InputsScaled(6));
+    
+        % scale control inputs back to actual numerical values (2023-11-26)
+        PS_targets = all_scenarios_p_outputs{probCntr,1}(end).PS_targets;
+        [true_Us,~] = mapminmax('reverse',[u_opt_1_s,u_opt_2_s]',PS_targets);
+
+        RL_actions_array(probCntr,numPolCntr,1) = true_Us(1);
+        RL_actions_array(probCntr,numPolCntr,2) = true_Us(2);
+
+    end % end loop through policies
+
+    fprintf('\n Problem number: %d\n',probCntr);
+
+end % end loop through problems
+
+% chatGPT consulted for the code (up until before functions)
+r = (MPC_actions_array - RL_actions_array).^2;
+rdotr.all_data = sum(r,3);
+rdotr.mean_vals = squeeze(mean(rdotr.all_data,1))';
+rdotr.std_vals = squeeze(std(rdotr.all_data,0,1))';
+
+rdotr.summary_data = [rdotr.mean_vals,...
+    rdotr.mean_vals + rdotr.std_vals,...
+    rdotr.mean_vals - rdotr.std_vals];
+
+%% plots (chatGPT)
+% Assuming summary_stats is 50x3:
+mean_vals = rdotr.summary_data(:, 1);
+upper_bound = rdotr.summary_data(:, 2);
+lower_bound = rdotr.summary_data(:, 3);
+
+x = policy_times_vec;  
+
+figure;
+hold on;
+
+% Plot the mean line
+plot(x, mean_vals, 'k:o', 'LineWidth', 2);
+
+% Fill the area between upper and lower bounds (shaded region)
+fill([x, fliplr(x)], [upper_bound', fliplr(lower_bound')], ...
+    [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1);  
+
+xlabel('k (s)');
+ylabel('r_\pi (-)');
+legend('mean','±1 std dev');
+set(gca,'FontSize',25);
+set(gcf,'Color','w');
+
+toc 
 
 %% functions
 % cost function for two-dimensional states (2023-10-21)
