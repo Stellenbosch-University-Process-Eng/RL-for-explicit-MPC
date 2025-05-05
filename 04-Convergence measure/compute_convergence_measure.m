@@ -240,15 +240,18 @@ figure;
 hold on;
 
 % Plot the mean line
-plot(x, mean_vals, 'k:o', 'LineWidth', 2);
+plot_1 = plot(x, mean_vals, 'k:o', 'LineWidth', 2);
 
 % Fill the area between upper and lower bounds (shaded region)
-fill([x, fliplr(x)], [upper_bound', fliplr(lower_bound')], ...
-    [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1);  
+plot_2 = fill([x, fliplr(x)], [upper_bound', fliplr(lower_bound')], ...
+        [0 0 0], 'EdgeColor', 'none', 'FaceAlpha', 0.1);  
+
+% reference line corresponding to a residual of zero
+plot_3 = yline(0,'k--','LineWidth',1);
 
 xlabel('k (s)');
 ylabel('r_\pi (-)');
-legend('mean','±1 std dev');
+legend([plot_1,plot_2],{'mean','±1 std dev'});
 set(gca,'FontSize',25);
 set(gcf,'Color','w');
 
