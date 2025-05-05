@@ -254,6 +254,7 @@ ylabel('r_\pi (-)');
 legend([plot_1,plot_2],{'mean','±1 std dev'});
 set(gca,'FontSize',25);
 set(gcf,'Color','w');
+axis tight;
 
 toc 
 
