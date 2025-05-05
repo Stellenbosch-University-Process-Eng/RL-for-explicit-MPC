@@ -18,17 +18,18 @@ load('value_data_gamma_001_numlevels_5.mat');
 
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
-nmberStepsSpecified = 20000;
+nmberStepsSpecified = 50000;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
-numberScenarios = 2;
+numberScenarios = 1;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
+    gammaSpecs.const_gamma = 0.2;
     gammaSpecs.gamma_vec_start = 0;
     gammaSpecs.gamma_vec_end = nmberStepsSpecified;
-    gammaSpecs.gamma_final = 0.1;
-    gammaSpecs.initial_gammas = 0.01; % (2023-11-09)
+    gammaSpecs.gamma_final = gammaSpecs.const_gamma; %0.1;
+    gammaSpecs.initial_gammas = gammaSpecs.const_gamma; %0.01; % (2023-11-09)
     
     gammaSpecs.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
     
@@ -118,13 +119,13 @@ for scenarioCntr = 1:1:numberScenarios
     % SP 1
     spSample.setPoint_low = 20; 
     spSample.setPoint_high = 30; 
-    spSample.nmberTimes = 6;
+    spSample.nmberTimes = 30;
     spSample.stepLim = 10; % step size constraint incorporated on 2024-12-04
     
     % SP 2
     spSample_2.setPoint_low = 20;  
     spSample_2.setPoint_high = 30; 
-    spSample_2.nmberTimes = 6;
+    spSample_2.nmberTimes = 30;
     spSample_2.stepLim = 10; % step size constraint incorporated on 2024-12-04
     
     % sample SPs
