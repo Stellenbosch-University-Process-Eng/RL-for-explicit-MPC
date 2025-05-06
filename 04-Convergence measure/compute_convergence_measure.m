@@ -250,7 +250,7 @@ plot_2 = fill([x, fliplr(x)], [upper_bound', fliplr(lower_bound')], ...
 plot_3 = yline(0,'k--','LineWidth',1);
 
 xlabel('k (s)');
-ylabel('r_\pi (-)');
+ylabel('r_\pi (V^2)');
 legend([plot_1,plot_2],{'mean','±1 std dev'});
 set(gca,'FontSize',25);
 set(gcf,'Color','w');
