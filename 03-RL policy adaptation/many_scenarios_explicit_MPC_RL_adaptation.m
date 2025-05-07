@@ -28,8 +28,8 @@ for scenarioCntr = 1:1:numberScenarios
     % gammaSpecs.const_gamma = 0.010;
     gammaSpecs.gamma_vec_start = 0;
     gammaSpecs.gamma_vec_end = nmberStepsSpecified;
-    gammaSpecs.gamma_final = 0.2;
-    gammaSpecs.initial_gammas = 0.2; % (2023-11-09)
+    gammaSpecs.gamma_final = 0.1;
+    gammaSpecs.initial_gammas = 0.1; % (2023-11-09)
     
     gammaSpecs.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
     
@@ -208,9 +208,9 @@ end % end loop through scenarios
 delete(myPool)
 
 %% save results
-non_min_phase_single_problem_gamma_0Point2.Experience = all_scenarios_out_Experience; % save experience generated during training
-non_min_phase_single_problem_gamma_0Point2.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-non_min_phase_single_problem_gamma_0Point2.logging.model_parameters = param;          % save dynamic model's parameters
+non_min_phase_single_problem_gamma_0Point1.Experience = all_scenarios_out_Experience; % save experience generated during training
+non_min_phase_single_problem_gamma_0Point1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+non_min_phase_single_problem_gamma_0Point1.logging.model_parameters = param;          % save dynamic model's parameters
 
 % filename = '/scratch3/20068530/non_min_phase_increase_gamma_ten_scenarios';
 % save(filename,'non_min_phase_increase_gamma_ten_scenarios',"-v7.3");
