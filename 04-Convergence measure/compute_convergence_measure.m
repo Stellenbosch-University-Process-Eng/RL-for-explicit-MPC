@@ -251,7 +251,7 @@ plot_3 = yline(0,'k--','LineWidth',1);
 
 xlabel('k (s)');
 ylabel('e_\pi (V^2)');
-legend([plot_1,plot_2],{'mean','±1 std dev'});
+legend([plot_1,plot_2],{'mean residual error','±1 std dev'});
 set(gca,'FontSize',25);
 set(gcf,'Color','w');
 axis tight;
