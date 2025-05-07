@@ -10,7 +10,7 @@ rng(2)
 tic % start measuring wall time
 
 %% start parallel pool, 2022-10-17
-% myPool = parpool('local'); 
+myPool = parpool('local'); 
 
 %% load policy and value function data
 load('policy_data_gamma_001_numlevels_5.mat');
@@ -18,18 +18,18 @@ load('value_data_gamma_001_numlevels_5.mat');
 
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
-nmberStepsSpecified = 2e6;%50000;
+nmberStepsSpecified = 50000;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
-numberScenarios = 10;
+numberScenarios = 1;%10;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
     % gammaSpecs.const_gamma = 0.010;
     gammaSpecs.gamma_vec_start = 0;
     gammaSpecs.gamma_vec_end = nmberStepsSpecified;
-    gammaSpecs.gamma_final = 0.5;
-    gammaSpecs.initial_gammas = 0.01; % (2023-11-09)
+    gammaSpecs.gamma_final = 0.2;
+    gammaSpecs.initial_gammas = 0.2; % (2023-11-09)
     
     gammaSpecs.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
     
@@ -205,15 +205,15 @@ for scenarioCntr = 1:1:numberScenarios
 end % end loop through scenarios
     
 %%
-% delete(myPool)
+delete(myPool)
 
 %% save results
-non_min_phase_increase_gamma_ten_scenarios.Experience = all_scenarios_out_Experience; % save experience generated during training
-non_min_phase_increase_gamma_ten_scenarios.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-non_min_phase_increase_gamma_ten_scenarios.logging.model_parameters = param;          % save dynamic model's parameters
+non_min_phase_single_problem_gamma_0Point2.Experience = all_scenarios_out_Experience; % save experience generated during training
+non_min_phase_single_problem_gamma_0Point2.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+non_min_phase_single_problem_gamma_0Point2.logging.model_parameters = param;          % save dynamic model's parameters
 
-filename = '/scratch3/20068530/non_min_phase_increase_gamma_ten_scenarios';
-save(filename,'non_min_phase_increase_gamma_ten_scenarios',"-v7.3");
+% filename = '/scratch3/20068530/non_min_phase_increase_gamma_ten_scenarios';
+% save(filename,'non_min_phase_increase_gamma_ten_scenarios',"-v7.3");
 
 toc % moved 2022-10-17
 
