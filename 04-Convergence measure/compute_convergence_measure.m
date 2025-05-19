@@ -249,7 +249,7 @@ plot_2 = fill([x, fliplr(x)], [upper_bound', fliplr(lower_bound')], ...
 % reference line corresponding to a squared difference of zero
 plot_3 = yline(0,'k--','LineWidth',1);
 
-xlabel('k (s)');
+xlabel('Time (s)');
 ylabel('\Delta_\pi (V^2)');
 legend([plot_1,plot_2],{'mean squared difference','±1 std dev'});
 set(gca,'FontSize',25);
