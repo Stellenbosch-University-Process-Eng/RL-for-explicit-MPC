@@ -23,7 +23,7 @@ load('min_phase_value_data.mat');
 nmberStepsSpecified = 2e6;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
-numberScenarios = 10; %1;
+numberScenarios = 1; %10; %1;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
@@ -139,8 +139,8 @@ for scenarioCntr = 1:1:numberScenarios
     spSample_2 = quadruple_tank_step_constrained_SP_sampling(spSample_2,[param.x0(1),param.x0(2)],2);
 
     %% initialize counters and levels for the step size parameter (2022-10-17)
-    StepSizes.nmberOfStepSizeLevels = 10;    % number of step size levels to consider, 2022-10-17
-    StepSizes.low_stepSizeBound = 0;        % lower bound for step sizes, 2022-10-17
+    StepSizes.nmberOfStepSizeLevels = 1;%10;    % number of step size levels to consider, 2022-10-17
+    StepSizes.low_stepSizeBound = 3.33e-4;%0;        % lower bound for step sizes, 2022-10-17
     StepSizes.high_stepSizeBound = 3.33e-4; % upper bound for step sizes, 2022-10-17
     StepSizes.hyperparameterValues = linspace(StepSizes.low_stepSizeBound,StepSizes.high_stepSizeBound,StepSizes.nmberOfStepSizeLevels); % step sizes at which to conduct training, 2022-10-17
     
@@ -210,12 +210,12 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-min_phase_slowly_decreasing_gamma_ten_scenarios.Experience = all_scenarios_out_Experience; % save experience generated during training
-min_phase_slowly_decreasing_gamma_ten_scenarios.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-min_phase_slowly_decreasing_gamma_ten_scenarios.logging.model_parameters = param;          % save dynamic model's parameters
+min_phase_slowly_decreasing_gamma_one_scenario_one_LR.Experience = all_scenarios_out_Experience; % save experience generated during training
+min_phase_slowly_decreasing_gamma_one_scenario_one_LR.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+min_phase_slowly_decreasing_gamma_one_scenario_one_LR.logging.model_parameters = param;          % save dynamic model's parameters
 
-filename = '/scratch3/20068530/min_phase_slowly_decreasing_gamma_ten_scenarios';
-save(filename,'min_phase_slowly_decreasing_gamma_ten_scenarios',"-v7.3");
+filename = '/scratch3/20068530/min_phase_slowly_decreasing_gamma_one_scenario_one_LR';
+save(filename,'min_phase_slowly_decreasing_gamma_one_scenario_one_LR',"-v7.3");
 
 toc % moved 2022-10-17
 
