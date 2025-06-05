@@ -10,26 +10,28 @@ rng(2)
 tic % start measuring wall time
 
 %% start parallel pool, 2022-10-17
-myPool = parpool('local'); 
+% myPool = parpool('local'); 
 
 %% load policy and value function data
-load('policy_data_gamma_001_numlevels_5.mat');
-load('value_data_gamma_001_numlevels_5.mat');
+% load('policy_data_gamma_001_numlevels_5.mat');
+% load('value_data_gamma_001_numlevels_5.mat');
+load('min_phase_policy_data.mat');
+load('min_phase_value_data.mat');
 
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
-nmberStepsSpecified = 50000;
+nmberStepsSpecified = 2e6;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
-numberScenarios = 1;%10;
+numberScenarios = 1;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
     % gammaSpecs.const_gamma = 0.010;
     gammaSpecs.gamma_vec_start = 0;
     gammaSpecs.gamma_vec_end = nmberStepsSpecified;
-    gammaSpecs.gamma_final = 0.1;
-    gammaSpecs.initial_gammas = 0.1; % (2023-11-09)
+    gammaSpecs.gamma_final = 0.23;
+    gammaSpecs.initial_gammas = 0.95; % (2023-11-09)
     
     gammaSpecs.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
     
@@ -79,8 +81,8 @@ for scenarioCntr = 1:1:numberScenarios
     param.a2 = 0.057;
     param.a4 = param.a2;
     param.g = 981;          % gravitational acceleration (cm/s^2)
-    param.k1 = 3.14;        % pump 1 gain (cm^3/V)
-    param.k2 = 3.29;        % pump 2 gain (cm^3/V)
+    param.k1 = 3.33;        % pump 1 gain (cm^3/V)
+    param.k2 = 3.33;        % pump 2 gain (cm^3/V)
     param.gamma1 = gammaSpecs.initial_gammas; %gammaSpecs.const_gamma;    % fraction opening pump 1 three-way valve (-)
     param.gamma2 = gammaSpecs.initial_gammas;  %gammaSpecs.const_gamma;    % fraction opening pump 2 three-way valve (-)
     
@@ -205,15 +207,15 @@ for scenarioCntr = 1:1:numberScenarios
 end % end loop through scenarios
     
 %%
-delete(myPool)
+% delete(myPool)
 
 %% save results
-non_min_phase_single_problem_gamma_0Point1.Experience = all_scenarios_out_Experience; % save experience generated during training
-non_min_phase_single_problem_gamma_0Point1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-non_min_phase_single_problem_gamma_0Point1.logging.model_parameters = param;          % save dynamic model's parameters
+min_phase_slowly_decreasing_gamma_one_scenario.Experience = all_scenarios_out_Experience; % save experience generated during training
+min_phase_slowly_decreasing_gamma_one_scenario.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+min_phase_slowly_decreasing_gamma_one_scenario.logging.model_parameters = param;          % save dynamic model's parameters
 
-% filename = '/scratch3/20068530/non_min_phase_increase_gamma_ten_scenarios';
-% save(filename,'non_min_phase_increase_gamma_ten_scenarios',"-v7.3");
+filename = '/scratch3/20068530/min_phase_slowly_decreasing_gamma_one_scenario';
+save(filename,'min_phase_slowly_decreasing_gamma_one_scenario',"-v7.3");
 
 toc % moved 2022-10-17
 
