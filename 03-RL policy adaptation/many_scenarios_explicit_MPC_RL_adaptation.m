@@ -23,7 +23,7 @@ load('min_phase_value_data.mat');
 nmberStepsSpecified = 2e6;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
-numberScenarios = 1;
+numberScenarios = 10; %1;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
@@ -210,12 +210,12 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-min_phase_slowly_decreasing_gamma_one_scenario.Experience = all_scenarios_out_Experience; % save experience generated during training
-min_phase_slowly_decreasing_gamma_one_scenario.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-min_phase_slowly_decreasing_gamma_one_scenario.logging.model_parameters = param;          % save dynamic model's parameters
+min_phase_slowly_decreasing_gamma_ten_scenarios.Experience = all_scenarios_out_Experience; % save experience generated during training
+min_phase_slowly_decreasing_gamma_ten_scenarios.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+min_phase_slowly_decreasing_gamma_ten_scenarios.logging.model_parameters = param;          % save dynamic model's parameters
 
-filename = '/scratch3/20068530/min_phase_slowly_decreasing_gamma_one_scenario';
-save(filename,'min_phase_slowly_decreasing_gamma_one_scenario',"-v7.3");
+filename = '/scratch3/20068530/min_phase_slowly_decreasing_gamma_ten_scenarios';
+save(filename,'min_phase_slowly_decreasing_gamma_ten_scenarios',"-v7.3");
 
 toc % moved 2022-10-17
 
