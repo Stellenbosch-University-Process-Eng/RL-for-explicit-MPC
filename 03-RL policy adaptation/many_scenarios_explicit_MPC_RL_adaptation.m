@@ -4,7 +4,8 @@
 %% Date: 2024-04-26
 clc
 clearvars -except ans; close all;
-rng(2)
+sim_seed = 2;
+rng(sim_seed)
 
 %%
 tic % start measuring wall time
@@ -213,6 +214,7 @@ end % end loop through scenarios
 min_phase_slowly_decreasing_gamma_one_scenario_one_LR.Experience = all_scenarios_out_Experience; % save experience generated during training
 min_phase_slowly_decreasing_gamma_one_scenario_one_LR.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
 min_phase_slowly_decreasing_gamma_one_scenario_one_LR.logging.model_parameters = param;          % save dynamic model's parameters
+min_phase_slowly_decreasing_gamma_one_scenario_one_LR.logging.seed = sim_seed;
 
 filename = '/scratch3/20068530/min_phase_slowly_decreasing_gamma_one_scenario_one_LR';
 save(filename,'min_phase_slowly_decreasing_gamma_one_scenario_one_LR',"-v7.3");
