@@ -390,8 +390,8 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
             %% store training data
             out_agentExperience.avgR(stepCntr) = p.avgR; % average reward (2023-06-29)
             out_agentExperience.R(stepCntr) = R;
-            out_agentExperience.S1_sqrd_dev(stepCntr) = (nxtState_1(currentTimeStamp) - nxtState_3(currentTimeStamp) )^2; % squared deviation from SP 1
-            out_agentExperience.S2_sqrd_dev(stepCntr) = (nxtState_2(currentTimeStamp) - nxtState_4(currentTimeStamp) )^2; % squared deviation from SP 2
+            % out_agentExperience.S1_sqrd_dev(stepCntr) = (nxtState_1(currentTimeStamp) - nxtState_3(currentTimeStamp) )^2; % squared deviation from SP 1
+            % out_agentExperience.S2_sqrd_dev(stepCntr) = (nxtState_2(currentTimeStamp) - nxtState_4(currentTimeStamp) )^2; % squared deviation from SP 2
             out_agentExperience.State_1(stepCntr) = State_1(currentTimeStamp);
             out_agentExperience.State_2(stepCntr) = State_2(currentTimeStamp);
             out_agentExperience.State_3(stepCntr) = State_3(currentTimeStamp); % 2023-06-04
@@ -400,18 +400,19 @@ function [out_agentExperience,outPol,p,outCrit] = trainFunction(actor,...
             out_agentExperience.State_6(stepCntr) = State_6(currentTimeStamp); % 2023-11-17
             out_agentExperience.u_1_true(stepCntr) = p.u_1;   % true control input 1 (2023-11-06)
             out_agentExperience.u_2_true(stepCntr) = p.u_2;   % true control input 1 (2023-11-06)
-            out_agentExperience.temp_diff(stepCntr) = temporal_diff; % temporatl difference error (2023-11-17)
+%             out_agentExperience.temp_diff(stepCntr) = temporal_diff; % temporatl difference error (2023-11-17)
 
-            out_agentExperience.scaledState_1(stepCntr) = S_1_s;
-            out_agentExperience.scaledState_2(stepCntr) = S_2_s;
-            out_agentExperience.scaledState_3(stepCntr) = S_3_s;
-            out_agentExperience.scaledState_4(stepCntr) = S_4_s;
-            out_agentExperience.scaledState_5(stepCntr) = S_5_s;
-            out_agentExperience.scaledState_6(stepCntr) = S_6_s;
+            % out_agentExperience.scaledState_1(stepCntr) = S_1_s;
+            % out_agentExperience.scaledState_2(stepCntr) = S_2_s;
+            % out_agentExperience.scaledState_3(stepCntr) = S_3_s;
+            % out_agentExperience.scaledState_4(stepCntr) = S_4_s;
+            % out_agentExperience.scaledState_5(stepCntr) = S_5_s;
+            % out_agentExperience.scaledState_6(stepCntr) = S_6_s;
             
             %% record the valve positions applied to the process (2023-11-09)
-            out_agentExperience.gamma1(stepCntr) = p.gamma1;
-            out_agentExperience.gamma2(stepCntr) = p.gamma2;
+%             out_agentExperience.gamma1(stepCntr) = p.gamma1;
+%             out_agentExperience.gamma2(stepCntr) = p.gamma2;
+            out_agentExperience.gamma(stepCntr) = p.gamma1;
 
             %% Save neural networks
             if ismember(stepCntr,p.policySavingVec) % save policy if required
