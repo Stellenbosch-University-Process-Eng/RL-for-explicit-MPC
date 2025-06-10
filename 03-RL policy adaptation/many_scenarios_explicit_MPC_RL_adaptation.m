@@ -4,7 +4,7 @@
 %% Date: 2024-04-26
 clc
 clearvars -except ans; close all;
-sim_seed = 2;
+sim_seed = 1;
 rng(sim_seed)
 
 %%
@@ -14,25 +14,25 @@ tic % start measuring wall time
 % myPool = parpool('local'); 
 
 %% load policy and value function data
-% load('policy_data_gamma_001_numlevels_5.mat');
-% load('value_data_gamma_001_numlevels_5.mat');
-load('min_phase_policy_data.mat');
-load('min_phase_value_data.mat');
+load('policy_data_gamma_001_numlevels_5.mat');
+load('value_data_gamma_001_numlevels_5.mat');
+% load('min_phase_policy_data.mat');
+% load('min_phase_value_data.mat');
 
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
 nmberStepsSpecified = 2e6;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
-numberScenarios = 1; %10; %1;
+numberScenarios = 10; %1;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
     % gammaSpecs.const_gamma = 0.010;
     gammaSpecs.gamma_vec_start = 0;
     gammaSpecs.gamma_vec_end = nmberStepsSpecified;
-    gammaSpecs.gamma_final = 0.23;
-    gammaSpecs.initial_gammas = 0.95; % (2023-11-09)
+    gammaSpecs.gamma_final = 0.5;
+    gammaSpecs.initial_gammas = 0.01; % (2023-11-09)
     
     gammaSpecs.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
     
@@ -53,13 +53,20 @@ for scenarioCntr = 1:1:numberScenarios
     
     %% load critic network
     critic.NN = value_data.NN;
+    critic.nmber_input_nodes = size(critic.NN.hidden_layer_parameters,1) - 1;
+    critic.nmber_hidden_nodes = size(critic.NN.hidden_layer_parameters,2);
+    critic.NN.hidden_layer_parameters = randn(critic.nmber_input_nodes + 1, critic.nmber_hidden_nodes)*sqrt(2/critic.nmber_input_nodes);
+    critic.NN.output_layer_parameters = randn(critic.nmber_hidden_nodes + 1,1)*sqrt(1/critic.nmber_hidden_nodes);
+    critic.NN.hidden_layer_parameters(1,:) = 0;
+    critic.NN.output_layer_parameters(1,:) = 0;
+
     critic.NN.alpha = 0.5; % critic learning rate
     
     %% load preprocessing- and postprocessing data and store data processing 
     %% structures as fields of the parameter structure
     param.PS_input = policy_data.PS_input; 
     param.PS_targets = policy_data.PS_targets;
-    param.PS_Value_targets = value_data.PS_Value_targets;
+%     param.PS_Value_targets = value_data.PS_Value_targets;
     
     %% initialize average reward and relevant learning rate (2023-06-29)
     param.avgRAlpha = 0.5;     % learning rate used to update the average reward (2023-06-29)
@@ -82,8 +89,8 @@ for scenarioCntr = 1:1:numberScenarios
     param.a2 = 0.057;
     param.a4 = param.a2;
     param.g = 981;          % gravitational acceleration (cm/s^2)
-    param.k1 = 3.33;        % pump 1 gain (cm^3/V)
-    param.k2 = 3.33;        % pump 2 gain (cm^3/V)
+    param.k1 = 3.14;        % pump 1 gain (cm^3/V)
+    param.k2 = 3.29;        % pump 2 gain (cm^3/V)
     param.gamma1 = gammaSpecs.initial_gammas; %gammaSpecs.const_gamma;    % fraction opening pump 1 three-way valve (-)
     param.gamma2 = gammaSpecs.initial_gammas;  %gammaSpecs.const_gamma;    % fraction opening pump 2 three-way valve (-)
     
@@ -140,8 +147,8 @@ for scenarioCntr = 1:1:numberScenarios
     spSample_2 = quadruple_tank_step_constrained_SP_sampling(spSample_2,[param.x0(1),param.x0(2)],2);
 
     %% initialize counters and levels for the step size parameter (2022-10-17)
-    StepSizes.nmberOfStepSizeLevels = 1;%10;    % number of step size levels to consider, 2022-10-17
-    StepSizes.low_stepSizeBound = 3.33e-4;%0;        % lower bound for step sizes, 2022-10-17
+    StepSizes.nmberOfStepSizeLevels = 10;    % number of step size levels to consider, 2022-10-17
+    StepSizes.low_stepSizeBound = 0;        % lower bound for step sizes, 2022-10-17
     StepSizes.high_stepSizeBound = 3.33e-4; % upper bound for step sizes, 2022-10-17
     StepSizes.hyperparameterValues = linspace(StepSizes.low_stepSizeBound,StepSizes.high_stepSizeBound,StepSizes.nmberOfStepSizeLevels); % step sizes at which to conduct training, 2022-10-17
     
@@ -211,13 +218,13 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-min_phase_slowly_decreasing_gamma_one_scenario_one_LR.Experience = all_scenarios_out_Experience; % save experience generated during training
-min_phase_slowly_decreasing_gamma_one_scenario_one_LR.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-min_phase_slowly_decreasing_gamma_one_scenario_one_LR.logging.model_parameters = param;          % save dynamic model's parameters
-min_phase_slowly_decreasing_gamma_one_scenario_one_LR.logging.seed = sim_seed;
+non_min_phase_decr_gamma_scratch_V_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
+non_min_phase_decr_gamma_scratch_V_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+non_min_phase_decr_gamma_scratch_V_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
+non_min_phase_decr_gamma_scratch_V_ten_scen_batch_1.logging.seed = sim_seed;
 
-filename = '/scratch3/20068530/min_phase_slowly_decreasing_gamma_one_scenario_one_LR';
-save(filename,'min_phase_slowly_decreasing_gamma_one_scenario_one_LR',"-v7.3");
+filename = '/scratch3/20068530/non_min_phase_decr_gamma_scratch_V_ten_scen_batch_1';
+save(filename,'non_min_phase_decr_gamma_scratch_V_ten_scen_batch_1',"-v7.3");
 
 toc % moved 2022-10-17
 
@@ -497,8 +504,8 @@ function [temporal_diff,yrnj,p,z_rnj_hidden,z_rnj_output] = calculateTemporalDif
     [V_S_crnt,z_rnj_hidden,yrnj,z_rnj_output] = evaluate_ReLU_tanh_six_states_one_output(NN,State_1,State_2,State_3,State_4,State_5,State_6); % evaluate critic network at the current state
     [V_S_nxt,~,~,~] = evaluate_ReLU_tanh_six_states_one_output(NN,nxtState_1,nxtState_2,nxtState_3,nxtState_4,nxtState_5,nxtState_6); % evaluate critic network at the next state
 
-    [V_S_crnt,~] = mapminmax('reverse',V_S_crnt,p.PS_Value_targets);
-    [V_S_nxt,~] = mapminmax('reverse',V_S_nxt,p.PS_Value_targets);
+%     [V_S_crnt,~] = mapminmax('reverse',V_S_crnt,p.PS_Value_targets);
+%     [V_S_nxt,~] = mapminmax('reverse',V_S_nxt,p.PS_Value_targets);
 
     temporal_diff = R - p.avgR + V_S_nxt - V_S_crnt; % calculate the temporal difference in the average reward setting (2023-06-29)
     p = updateAverageReward(p,temporal_diff); % update the 
