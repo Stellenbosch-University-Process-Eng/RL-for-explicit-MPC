@@ -27,7 +27,7 @@ load('critic_scratch_NN.mat');
 nmberStepsSpecified = 2e6;
 upperReportVec = nmberStepsSpecified;
 upperPolicySavingVec = nmberStepsSpecified;
-numberScenarios = 1; %10; %1;
+numberScenarios = 10; %1;
 for scenarioCntr = 1:1:numberScenarios
     fprintf('\n%d\n\n',scenarioCntr); % display the scenario number
     %% set decay rate for valve positions
@@ -221,13 +221,13 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-non_min_phase_scratch_V_and_large_alphaR_one_scen.Experience = all_scenarios_out_Experience; % save experience generated during training
-non_min_phase_scratch_V_and_large_alphaR_one_scen.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-non_min_phase_scratch_V_and_large_alphaR_one_scen.logging.model_parameters = param;          % save dynamic model's parameters
-non_min_phase_scratch_V_and_large_alphaR_one_scen.logging.seed = sim_seed;
+non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
+non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
+non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
 
-filename = '/scratch3/20068530/non_min_phase_scratch_V_and_large_alphaR_one_scen';
-save(filename,'non_min_phase_scratch_V_and_large_alphaR_one_scen',"-v7.3");
+filename = '/scratch3/20068530/non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1';
+save(filename,'non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1',"-v7.3");
 
 toc % moved 2022-10-17
 
