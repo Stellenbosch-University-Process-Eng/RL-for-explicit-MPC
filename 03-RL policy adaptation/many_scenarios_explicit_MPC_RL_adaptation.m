@@ -72,7 +72,7 @@ for scenarioCntr = 1:1:numberScenarios
     param.PS_Value_targets = value_data.PS_Value_targets;
     
     %% initialize average reward and relevant learning rate (2023-06-29)
-    param.avgRAlpha = 0.9;%0.5;     % learning rate used to update the average reward (2023-06-29)
+    param.avgRAlpha = 0.5; %0.9;%0.5;     % learning rate used to update the average reward (2023-06-29)
     param.avgR = 0;            % initialize average reward (2023-06-29)
     
     %% set interval between reported step numbers (2023-06-30)
@@ -221,13 +221,13 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-non_min_phase_large_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
-non_min_phase_large_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-non_min_phase_large_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
-non_min_phase_large_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
+non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
+non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
+non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
 
-filename = '/scratch3/20068530/non_min_phase_large_alphaR_ten_scen_batch_1';
-save(filename,'non_min_phase_large_alphaR_ten_scen_batch_1',"-v7.3");
+filename = '/scratch3/20068530/non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1';
+save(filename,'non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1',"-v7.3");
 
 toc % moved 2022-10-17
 
