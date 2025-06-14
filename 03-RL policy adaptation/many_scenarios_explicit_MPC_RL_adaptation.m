@@ -14,13 +14,13 @@ tic % start measuring wall time
 % myPool = parpool('local'); 
 
 %% load policy and value function data
-load('policy_data_gamma_001_numlevels_5.mat');
-load('value_data_gamma_001_numlevels_5.mat');
+% load('policy_data_gamma_001_numlevels_5.mat');
+% load('value_data_gamma_001_numlevels_5.mat');
 
 % load('critic_scratch_NN.mat');
 
-% load('min_phase_policy_data.mat');
-% load('min_phase_value_data.mat');
+load('min_phase_policy_data.mat');
+load('min_phase_value_data.mat');
 
 % allocate variables using prompts to prevent user prompts from appearing
 % at the start of each training scenario
@@ -34,8 +34,8 @@ for scenarioCntr = 1:1:numberScenarios
     % gammaSpecs.const_gamma = 0.010;
     gammaSpecs.gamma_vec_start = 0;
     gammaSpecs.gamma_vec_end = nmberStepsSpecified;
-    gammaSpecs.gamma_final = 0.5;
-    gammaSpecs.initial_gammas = 0.01; % (2023-11-09)
+    gammaSpecs.gamma_final = 0.23;
+    gammaSpecs.initial_gammas = 0.95; % (2023-11-09)
     
     gammaSpecs.rateRepeat = 1; % how many subsequent time steps should the valve position be maintained 
     
@@ -92,8 +92,8 @@ for scenarioCntr = 1:1:numberScenarios
     param.a2 = 0.057;
     param.a4 = param.a2;
     param.g = 981;          % gravitational acceleration (cm/s^2)
-    param.k1 = 3.14;        % pump 1 gain (cm^3/V)
-    param.k2 = 3.29;        % pump 2 gain (cm^3/V)
+    param.k1 = 3.33;        % pump 1 gain (cm^3/V)
+    param.k2 = 3.33;        % pump 2 gain (cm^3/V)
     param.gamma1 = gammaSpecs.initial_gammas; %gammaSpecs.const_gamma;    % fraction opening pump 1 three-way valve (-)
     param.gamma2 = gammaSpecs.initial_gammas;  %gammaSpecs.const_gamma;    % fraction opening pump 2 three-way valve (-)
     
@@ -221,13 +221,13 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
-non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
-non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
 
-filename = '/scratch3/20068530/non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1';
-save(filename,'non_min_phase_incr_gamma_nominal_alphaR_ten_scen_batch_1',"-v7.3");
+filename = '/scratch3/20068530/min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1';
+save(filename,'min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1',"-v7.3");
 
 toc % moved 2022-10-17
 

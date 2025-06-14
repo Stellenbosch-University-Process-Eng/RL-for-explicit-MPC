@@ -5,7 +5,7 @@
 clc;clearvars -except ans;
 %%
 c = parcluster(); % initialize cluster using the default profile
-c.AdditionalProperties.Host = 'comp058'; %'comp046'; 
+c.AdditionalProperties.Host = 'comp053'; %'comp046'; 
 ncpu = 16; % number of cpu cores
 
 % submit job to the SU cluster
