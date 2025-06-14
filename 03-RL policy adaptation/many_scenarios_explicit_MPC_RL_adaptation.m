@@ -17,7 +17,7 @@ tic % start measuring wall time
 load('policy_data_gamma_001_numlevels_5.mat');
 load('value_data_gamma_001_numlevels_5.mat');
 
-load('critic_scratch_NN.mat');
+% load('critic_scratch_NN.mat');
 
 % load('min_phase_policy_data.mat');
 % load('min_phase_value_data.mat');
@@ -55,7 +55,7 @@ for scenarioCntr = 1:1:numberScenarios
     actor.NN.k_hidden_warm = actor.NN.k_hidden; % define "actor.NN.k_hidden_warm" for use in network evaluation function (2023-10-10)
     
     %% load critic network
-    critic.NN = critic_scratch_NN; %value_data.NN;
+    critic.NN = value_data.NN;
 %     critic.nmber_input_nodes = size(critic.NN.hidden_layer_parameters,1) - 1;
 %     critic.nmber_hidden_nodes = size(critic.NN.hidden_layer_parameters,2);
 %     critic.NN.hidden_layer_parameters = randn(critic.nmber_input_nodes + 1, critic.nmber_hidden_nodes)*sqrt(2/critic.nmber_input_nodes);
@@ -221,13 +221,13 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
-non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
-non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
+non_min_phase_large_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
+non_min_phase_large_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+non_min_phase_large_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
+non_min_phase_large_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
 
-filename = '/scratch3/20068530/non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1';
-save(filename,'non_min_phase_scratch_V_and_large_alphaR_ten_scen_batch_1',"-v7.3");
+filename = '/scratch3/20068530/non_min_phase_large_alphaR_ten_scen_batch_1';
+save(filename,'non_min_phase_large_alphaR_ten_scen_batch_1',"-v7.3");
 
 toc % moved 2022-10-17
 
@@ -507,8 +507,8 @@ function [temporal_diff,yrnj,p,z_rnj_hidden,z_rnj_output] = calculateTemporalDif
     [V_S_crnt,z_rnj_hidden,yrnj,z_rnj_output] = evaluate_ReLU_tanh_six_states_one_output(NN,State_1,State_2,State_3,State_4,State_5,State_6); % evaluate critic network at the current state
     [V_S_nxt,~,~,~] = evaluate_ReLU_tanh_six_states_one_output(NN,nxtState_1,nxtState_2,nxtState_3,nxtState_4,nxtState_5,nxtState_6); % evaluate critic network at the next state
 
-%     [V_S_crnt,~] = mapminmax('reverse',V_S_crnt,p.PS_Value_targets);
-%     [V_S_nxt,~] = mapminmax('reverse',V_S_nxt,p.PS_Value_targets);
+    [V_S_crnt,~] = mapminmax('reverse',V_S_crnt,p.PS_Value_targets);
+    [V_S_nxt,~] = mapminmax('reverse',V_S_nxt,p.PS_Value_targets);
 
     temporal_diff = R - p.avgR + V_S_nxt - V_S_crnt; % calculate the temporal difference in the average reward setting (2023-06-29)
     p = updateAverageReward(p,temporal_diff); % update the 
