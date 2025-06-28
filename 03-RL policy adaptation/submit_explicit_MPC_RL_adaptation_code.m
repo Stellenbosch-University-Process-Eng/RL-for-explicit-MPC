@@ -5,8 +5,8 @@
 clc;clearvars -except ans;
 %%
 c = parcluster(); % initialize cluster using the default profile
-c.AdditionalProperties.Host = 'comp053'; %'comp046'; 
-ncpu = 16; % number of cpu cores
+c.AdditionalProperties.Host = 'comp050'; %'comp046'; 
+ncpu = 15; % number of cpu cores
 
 % submit job to the SU cluster
 adapt_explicit_MPC = batch(c,'many_scenarios_explicit_MPC_RL_adaptation','Pool',ncpu,'CaptureDiary',true,'AttachedFiles',...

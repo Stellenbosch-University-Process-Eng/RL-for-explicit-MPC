@@ -4,7 +4,7 @@
 %% Date: 2024-04-26
 clc
 clearvars -except ans; close all;
-sim_seed = 1;
+sim_seed = 3;
 rng(sim_seed)
 
 %%
@@ -221,13 +221,13 @@ end % end loop through scenarios
 % delete(myPool)
 
 %% save results
-min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.Experience = all_scenarios_out_Experience; % save experience generated during training
-min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
-min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.logging.model_parameters = param;          % save dynamic model's parameters
-min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1.logging.seed = sim_seed;
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_3.Experience = all_scenarios_out_Experience; % save experience generated during training
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_3.Policies = all_scenarios_out_Policies;     % save policy networks generated during training
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_3.logging.model_parameters = param;          % save dynamic model's parameters
+min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_3.logging.seed = sim_seed;
 
-filename = '/scratch3/20068530/min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1';
-save(filename,'min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_1',"-v7.3");
+filename = '/scratch3/20068530/min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_3';
+save(filename,'min_phase_decr_gamma_nominal_alphaR_ten_scen_batch_3',"-v7.3");
 
 toc % moved 2022-10-17
 
