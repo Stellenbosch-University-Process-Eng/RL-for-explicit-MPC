@@ -17,8 +17,8 @@ param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
 param.k1 = 3.14;     % pump 1 gain (cm^3/V)
 param.k2 = 3.29;     % pump 2 gain (cm^3/V)
-param.gamma1 = @(t) 0.01 + 0*t; % fraction opening pump 1 three-way valve (-)
-param.gamma2 = @(t) 0.01 + 0*t; % fraction opening pump 2 three-way valve (-)
+param.gamma1 = @(t) 0.18 + 0*t; % fraction opening pump 1 three-way valve (-)
+param.gamma2 = @(t) 0.18 + 0*t; % fraction opening pump 2 three-way valve (-)
 
 %% specify initial state, SP, and prediction model inputs
 v_1_SS = @(t) 3 + 0*t; % pump 1 voltage (V)
@@ -55,8 +55,8 @@ abs_Kp_2 = abs( Output_dyn(end,2) - Output_dyn(1,2) );
 abs_inv_resp_magnitude_H1 = abs(max(Output_dyn(:,1)) - h_1_SS);
 abs_inv_resp_magnitude_H2 = abs(min(Output_dyn(:,2)) - h_2_SS);
 
-abs_inv_to_Kp_H1 = abs_inv_resp_magnitude_H1/abs_Kp_1
-abs_inv_to_Kp_H2 = abs_inv_resp_magnitude_H2/abs_Kp_2
+abs_inv_to_Kp_H1 = abs_inv_resp_magnitude_H1/abs_Kp_1;
+abs_inv_to_Kp_H2 = abs_inv_resp_magnitude_H2/abs_Kp_2;
 
 %% estimate characteristic times of each transfer function describing
 % the linearised reponse of each respective liquid height to the respective

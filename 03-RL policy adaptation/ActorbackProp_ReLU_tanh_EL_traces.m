@@ -1,5 +1,8 @@
-% backpropagation function for actor.  Eligibility traces used to
-% incorporate previous gradient information.
+%% Backpropagation function for actor with ReLU hidden layer activation and tanh
+%% output layer activation.  Eligibility traces can be used to
+%% incorporate previous gradient information, but were not used when
+%% generating the results reported in our paper, i.e. lambda and eligibility traces were set
+%% equal to zero.
 function [NN,p] = ActorbackProp_ReLU_tanh_EL_traces(NN,State_1,State_2,State_3,State_4,State_5,State_6,temporal_diff,sampled_u_1,sampled_u_2,p) % 2023-01-17
 
     % evaluate the actor network (2023-11-06)
@@ -58,7 +61,7 @@ function [NN,p] = ActorbackProp_ReLU_tanh_EL_traces(NN,State_1,State_2,State_3,S
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 
                 % calculate the partial derivative of the loss with respect
-                % to z_hidden_nj for the hidden network layer (hidden)
+                % to z_hidden_nj for the hidden network layer
                 delta_hidden_nj(j_hidden_bw) = e_hidden_nj(j_hidden_bw)*...
                     dfdz_hidden(j_hidden_bw);
                 

@@ -1,5 +1,5 @@
-%% Script that evaluates a neural network with ReLU hidden layer activation, 
-%% linear output activation, and two output layer nodes.
+%% Function used to evaluate a neural network with ReLU hidden layer activation, 
+%% tanh output activation, and two output layer nodes.
 %% Name: Edward Bras
 %% Date: 2023-02-15
 function [yrnj_output,yrnj_output_NODE_TWO,z_rnj_hidden,yrnj,z_rnj_outer,z_rnj_outer_NODE_TWO] = evaluate_ReLU_tanh_six_states(NN,X,Y,Z,A,B,C)

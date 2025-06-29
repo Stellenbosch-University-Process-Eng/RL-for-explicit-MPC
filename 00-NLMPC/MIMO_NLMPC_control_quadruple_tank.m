@@ -16,8 +16,8 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1;                   % set the sample time within the MPC object
-nlobj.PredictionHorizon = 50;  % prediction horizon
-nlobj.ControlHorizon = 20;       % number of steps to adjust across the horizon
+nlobj.PredictionHorizon = 50;   % prediction horizon
+nlobj.ControlHorizon = 20;      % number of steps to adjust across the horizon
 
 %% set valve positions
 param.gamma1 = 0.01;     % valve position 1
@@ -78,12 +78,6 @@ end
 
 nlobj.ManipulatedVariables(1).MaxECR = 0; % constraints on MV are hard constraints
 
-% %% set constraints on the measured output
-% for cntr = 1:1:nx
-%     nlobj.States(cntr).Min = 0.005;%0.1;%1.3; 
-%     nlobj.States(cntr).Max = 100;%20;
-% end
-
 %% specify a custom cost function
 param.Q = [1,0;0,1];    % weighting matrix for cost function (2023-10-28)
 param.R = [0,0;0,0];    % weighting matrix for control input cost (2023-11-10)
@@ -120,22 +114,14 @@ param.MV_ref = 0; % reference for MV tracking penalty (2023-11-13)
 nlobj.Optimization.CustomCostFcn = @(X,U,e,data,params) CostFunction_for_two_states(X,U,e,data,params); % (2023-10-28)
 nlobj.Optimization.ReplaceStandardCost = true;
 
-nlobj.Optimization.SolverOptions.Display = "none";%"iter";%'off'; % "iter";
-nlobj.Optimization.SolverOptions.FiniteDifferenceType = 'forward';%'central';
+nlobj.Optimization.SolverOptions.Display = "none";
+nlobj.Optimization.SolverOptions.FiniteDifferenceType = 'forward';
 
 nlobj.Optimization.SolverOptions.Algorithm = 'sqp-legacy';
 
-% nlobj.Optimization.SolverOptions.OptimalityTolerance = 1e0;
-% nlobj.Optimization.SolverOptions.UseParallel = true;
-% nlobj.Optimization.SolverOptions.ConstraintTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.OptimalityTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.FunctionTolerance = 1e-1;
 nlobj.Optimization.SolverOptions.MaxIterations = 40;
-
-% For details on cost function Jacobians, see https://www.mathworks.com/help/mpc/ug/specify-cost-function-for-nonlinear-mpc.html#mw_ec61fbdc-3879-4dae-8569-b48ba271111e
-
-% %% specify Jacobian for cost function
-% nlobj.Jacobian.CustomCostFcn = @(X,U,e,data,params) myCostJacobian(X,U,e,data,params);
 
 %% validate the prediction model's functions
 validateFcns(nlobj,x0,u0,[],{param}); % validate -> nlobj = object, x0 = starting states, u0 = control inputs, [] = no measured disturbances, Ts = an optional parameter
@@ -181,10 +167,10 @@ spSample_2 = quadruple_tank_step_constrained_SP_sampling(spSample_2,SP,2);
 nmberTspanEntries = 100;
 
 % set scale factors (2023-10-31)
-nlobj.States(1).ScaleFactor = 1;%spSample.setPoint_high - spSample.setPoint_low; 
-nlobj.States(2).ScaleFactor = 1;%spSample.setPoint_high - spSample.setPoint_low;
-nlobj.States(3).ScaleFactor = 1;%spSample.setPoint_high - spSample.setPoint_low;
-nlobj.States(4).ScaleFactor = 1;%spSample.setPoint_high - spSample.setPoint_low;
+nlobj.States(1).ScaleFactor = 1; 
+nlobj.States(2).ScaleFactor = 1;
+nlobj.States(3).ScaleFactor = 1;
+nlobj.States(4).ScaleFactor = 1;
 
 for currentTimeStamp = 1:1:(simulationTime/nlobj.Ts)
 
@@ -320,26 +306,6 @@ function J = CostFunction_for_two_states(X,U,e,data,params)
     J = sum(  SP_tracking_cost + MV_tracking_cost + MV_rate_cost ) ... 
         + e;
 
-end
-
-% Cost function Jacobian
-function [G,Gmv,Ge] = myCostJacobian(X,U,e,data,param)
-    N = data.PredictionHorizon;
-    X_1 = X(2:N+1,1); % state 1
-    X_2 = X(2:N+1,2); % state 2
-    Refs_1 = data.References(1:N,1);
-    Refs_2 = data.References(1:N,2);
-    Nx = data.NumOfStates;
-    Nu = data.NumOfInputs;
-
-    G = zeros(N,Nx); % initialize Jacobian
-    G(1:N,1) = -2.*(Refs_1 - X_1);
-    G(1:N,2) = -2.*(Refs_2 - X_2);
-    G(1:N,3) = 0;
-    G(1:N,4) = 0;
-
-    Gmv = zeros(N,Nu); % Jacobian w.r.t. the manipulated variables
-    Ge = 0;  % Jacobian w.r.t. slack variables
 end
 
 % mixing tank model for call to MPC optimization routine

@@ -1,7 +1,6 @@
-%% Script used to generate optimal policy and optimal value function data points across the state space.
+%% Script used to generate optimal policy and optimal value function data points within the state space.
 %% Date: 2023-10-04
 %% Link for MPC toolbox:  https://www.mathworks.com/help/mpc/ref/nlmpc.html
-%% Link for creating a wait bar: https://www.mathworks.com/matlabcentral/answers/400243-wait-bar-in-matlab-gui-in-nested-for-loop
 clc;clear;close all
 rng(1)
 tic
@@ -231,14 +230,8 @@ for cntr = 1:1:resolution4Grid^nmberRLStates
     u_opt_one(row(1),row(2),row(3),row(4),row(5),row(6)) = Info.MVopt(1,1); % save optimal control input 1
     u_opt_two(row(1),row(2),row(3),row(4),row(5),row(6)) = Info.MVopt(1,2); % save optimal control input 2
     optimalCosts(row(1),row(2),row(3),row(4),row(5),row(6)) = -1*Info.Cost; % save -1*optimal cost (2024_04_25)
-    
-    % display error message if waitbar is closed:
-%     if ~ishghandle(H) % (2023-11-16)
-%         error('Waitbar has been closed.');
-%     end
 
     cntr_wait = cntr_wait + 1; % update waitbar counter (2023-11-16)
-%     waitbar(cntr_wait/nmberOpts,H,sprintf('Optimization %d of %d',cntr_wait,nmberOpts)); % update waitbar (2023-11-16)
     fprintf('\n%d\n',cntr_wait);
 
 end

@@ -1,14 +1,16 @@
-%% Script that simulates closed-loop MIMO control using the explicit MPC generated
-%% in the script "fit_ff_net_MIMO_data.m".
+%% Script that simulates closed-loop MIMO control using the explicit MPC.
 %% Name: Edward Bras
 %% Date: 2023-11-24
+
+%% NOTE: Warm-started policy generated using "NN_fit_to_optimal_policy.m" must
+%% be available in Current Folder.
 
 clc;clearvars -except ans;
 rng(1)
 
 tic 
 
-%% load policy data
+%% load policy data (saved data required - see NOTE above)
 load("policy_data_gamma_001_numlevels_5.mat");
 
 %% set decay rate for valve positions
@@ -47,7 +49,7 @@ h_4_SS_initial_guess = 9.28;
 %% simulate the non-linear process model
 final_time = 1e6;
 tspan = linspace(0,final_time,final_time); % time span (s)
-[~,Output] = ode23s(@(t,x) QTProcess_NL_solve_SS(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');%,opts);
+[~,Output] = ode23s(@(t,x) QTProcess_NL_solve_SS(t,x,param,v_1_SS,v_2_SS),tspan,[h_1_SS_initial_guess,h_2_SS_initial_guess,h_3_SS_initial_guess,h_4_SS_initial_guess]');
 
 %% save steady states
 h_1_SS = Output(end,1);
@@ -137,12 +139,6 @@ for currentTimeStamp = 1:1:(simulationTime/Ts)
     [true_Us,~] = mapminmax('reverse',[u_opt_1_s,u_opt_2_s]',PS_targets);
     u_opt_1 = true_Us(1); % scale control input one to true numerical value
     u_opt_2 = true_Us(2); % scale control input two to true numerical value
-
-%     % use built-in evaluation of NN object to enact control (2023-11-04)
-%     U_approx = sim(net,[SP(1),SP(2),x_k(1),x_k(2),x_k(3),x_k(4)]');
-%     % scale control inputs back to actual numerical values (2023-11-26)
-%     u_opt_1 = U_approx(1);
-%     u_opt_2 = U_approx(2);
     
     % saturate the control inputs if required (2023-11-03)
     if u_opt_1 < Limits.u_lower

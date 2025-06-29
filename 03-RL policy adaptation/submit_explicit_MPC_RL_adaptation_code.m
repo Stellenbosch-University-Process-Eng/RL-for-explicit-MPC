@@ -1,11 +1,11 @@
-%% script used to submit RL adaptation code to the SU HPC.
+%% script used to submit explicit MPC adaptation code to the SU HPC (parallel computations).
 %% Name: Edward Bras
 %% Date: 2025-04-23
 
 clc;clearvars -except ans;
 %%
 c = parcluster(); % initialize cluster using the default profile
-c.AdditionalProperties.Host = 'comp050'; %'comp046'; 
+c.AdditionalProperties.Host = 'comp050';  
 ncpu = 15; % number of cpu cores
 
 % submit job to the SU cluster

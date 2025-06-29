@@ -1,4 +1,4 @@
-%% script used to evaluate neural network with ReLU hidden layer activation
+%% Function used to evaluate neural network with ReLU hidden layer activation
 %% and tanh output layer activation.
 %% Edward Bras
 %% Date: 2024-04-26

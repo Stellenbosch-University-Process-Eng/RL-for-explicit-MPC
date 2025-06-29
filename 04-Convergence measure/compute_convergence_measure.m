@@ -6,6 +6,12 @@ clc;clear;close all;
 
 tic 
 
+%% NOTE: Three structures need to be available in CUrrent Folder:
+%% 1) "all_scenarios_out_Experience"
+%% 2) "all_scenarios_out_Policies"
+%% 3) "all_scenarios_p_outputs"
+%% These structures can be created using "many_scenarios_explicit_MPC_RL_adaptation.m".
+
 %% load saved data
 load('Exp_many_scenarios.mat');      % load all measured states during RL training
 load('Policies_many_scenarios.mat'); % load policies generated during RL training
@@ -30,7 +36,7 @@ nlobj = nlmpc(nx,ny,nu); % create the non-linear MPC object
 
 %% specifying controller parameters
 nlobj.Ts = 1;                           % set the sample time within the MPC object
-nlobj.PredictionHorizon = 10;          % prediction horizon
+nlobj.PredictionHorizon = 10;           % prediction horizon
 nlobj.ControlHorizon = 5;               % number of steps to adjust across the horizon
 
 %% define parameters for model
@@ -121,17 +127,17 @@ e = 0;       % only hard constraints are applicable
 % also see https://www.mathworks.com/help/mpc/ug/optimization-problem.html
 % for discussion of default MPC cost functions
 
-param.S_tracking = 1; % scale factor for SP tracking cost (2023-11-13)
+param.S_tracking = 1;                           % scale factor for SP tracking cost (2023-11-13)
 param.S_MV = nlobj.MV(1).Max - nlobj.MV(1).Min; % scale factor for MV adjustment (2023-11-13)
-param.S_MV_rate = 1;%nlobj.MV(1).Max - nlobj.MV(1).Min; % scale factor used for rate of MV adjustment (2023-11-13)
-param.MV_ref = 0; % reference for MV tracking penalty (2023-11-13)
+param.S_MV_rate = 1;                            % scale factor used for rate of MV adjustment (2023-11-13)
+param.MV_ref = 0;                               % reference for MV tracking penalty (2023-11-13)
 
 %% https://www.mathworks.com/help/optim/ug/tolerances-and-stopping-criteria.html
 nlobj.Optimization.CustomCostFcn = @(X,U,e,data,params) CostFunction_for_two_states(X,U,e,data,params); % (2023-10-28)
 nlobj.Optimization.ReplaceStandardCost = true;
 
-nlobj.Optimization.SolverOptions.Display = "none";%'off'; % "iter";
-nlobj.Optimization.SolverOptions.FiniteDifferenceType = 'forward';%'central';
+nlobj.Optimization.SolverOptions.Display = "none";
+nlobj.Optimization.SolverOptions.FiniteDifferenceType = 'forward';
 
 nlobj.Optimization.SolverOptions.Algorithm = 'sqp-legacy';
 
@@ -218,7 +224,8 @@ for probCntr = 1:1:numProbs
 
 end % end loop through problems
 
-% chatGPT consulted for the code (up until before functions)
+% chatGPT consulted 
+% note: chatGPT only used to improve efficiency of the MATLAB code.
 r = (MPC_actions_array - RL_actions_array).^2;
 rdotr.all_data = sum(r,3);
 rdotr.mean_vals = squeeze(mean(rdotr.all_data,1))';
@@ -228,7 +235,7 @@ rdotr.summary_data = [rdotr.mean_vals,...
     rdotr.mean_vals + rdotr.std_vals,...
     rdotr.mean_vals - rdotr.std_vals];
 
-%% plots (chatGPT)
+%% plots (chatGPT - only used to improve efficiency of the MATLAB code)
 % Assuming summary_stats is 50x3:
 mean_vals = rdotr.summary_data(:, 1);
 upper_bound = rdotr.summary_data(:, 2);

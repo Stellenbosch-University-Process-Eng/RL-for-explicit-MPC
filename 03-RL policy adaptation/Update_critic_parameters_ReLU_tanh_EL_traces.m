@@ -1,6 +1,8 @@
-%% backpropagation function for critic with ReLU hidden layer activation and tanh
-%% output layer activation.  Eligibility traces used to
-%% incorporate previous gradient information.
+%% Backpropagation function for critic with ReLU hidden layer activation and tanh
+%% output layer activation.  Eligibility traces can be used to
+%% incorporate previous gradient information, but were not used when generating
+%% the results reported in our paper, i.e. lambda and eligibility traces were set
+%% equal to zero.
 function [NN,p] = Update_critic_parameters_ReLU_tanh_EL_traces(NN,State_1,State_2,State_3,State_4,State_5,State_6,delta_Lnj,temporal_diff,yrnj,z_rnj_hidden,p)
 
     % loop through the neurons in the hidden layer

@@ -2,6 +2,10 @@
 %% nominal process parameter set.
 %% Name: Edward Bras
 %% Date: 2024-04-26
+
+%% NOTE: Optimal value function data generated using "generate_optimal_cost_and_policy_data.m"
+%% must be available in Current Folder.
+
 clc;clearvars -except ans;close all;
 rng(2);
 
@@ -9,7 +13,7 @@ rng(2);
 gamma_val = 0.01;
 numLevels = 5;
 
-%% load structure containing all training data
+%% load structure containing all training data (saved data required - see NOTE above)
 gammaMult100 = 100*gamma_val;
 filename_test = sprintf('data_gamma_%03d_numlevels_%d',gammaMult100,numLevels);
 test_file = load(filename_test);
@@ -21,10 +25,10 @@ training_data = test_file.(test_varname);
 %% data processing
 data.SP_input_1_reshaped = reshape(training_data.SP_1_grid,1,size(training_data.SP_1_grid,1)*size(training_data.SP_1_grid,2)*size(training_data.SP_1_grid,3)*size(training_data.SP_1_grid,4)*size(training_data.SP_1_grid,5)*size(training_data.SP_1_grid,6));       % reshape SP coordinates
 data.SP_input_2_reshaped = reshape(training_data.SP_2_grid,1,size(training_data.SP_2_grid,1)*size(training_data.SP_2_grid,2)*size(training_data.SP_2_grid,3)*size(training_data.SP_2_grid,4)*size(training_data.SP_2_grid,5)*size(training_data.SP_2_grid,6));       % reshape SP coordinates (2023-11-16)
-data.H_one_reshaped = reshape(training_data.H_1_grid,1,size(training_data.H_1_grid,1)*size(training_data.H_1_grid,2)*size(training_data.H_1_grid,3)*size(training_data.H_1_grid,4)*size(training_data.H_1_grid,5)*size(training_data.H_1_grid,6));    % reshape H1 coordinates (2023-11-01)
-data.H_two_reshaped = reshape(training_data.H_2_grid,1,size(training_data.H_2_grid,1)*size(training_data.H_2_grid,2)*size(training_data.H_2_grid,3)*size(training_data.H_2_grid,4)*size(training_data.H_2_grid,5)*size(training_data.H_2_grid,6));    % reshape H2 coordinates (2023-11-01)
-data.H_three_reshaped = reshape(training_data.H_3_grid,1,size(training_data.H_3_grid,1)*size(training_data.H_3_grid,2)*size(training_data.H_3_grid,3)*size(training_data.H_3_grid,4)*size(training_data.H_3_grid,5)*size(training_data.H_3_grid,6));  % reshape H3 coordinates (2023-11-01)
-data.H_four_reshaped = reshape(training_data.H_4_grid,1,size(training_data.H_4_grid,1)*size(training_data.H_4_grid,2)*size(training_data.H_4_grid,3)*size(training_data.H_4_grid,4)*size(training_data.H_4_grid,5)*size(training_data.H_4_grid,6));   % reshape H4 coordinates (2023-11-01)
+data.H_one_reshaped = reshape(training_data.H_1_grid,1,size(training_data.H_1_grid,1)*size(training_data.H_1_grid,2)*size(training_data.H_1_grid,3)*size(training_data.H_1_grid,4)*size(training_data.H_1_grid,5)*size(training_data.H_1_grid,6));                   % reshape H1 coordinates (2023-11-01)
+data.H_two_reshaped = reshape(training_data.H_2_grid,1,size(training_data.H_2_grid,1)*size(training_data.H_2_grid,2)*size(training_data.H_2_grid,3)*size(training_data.H_2_grid,4)*size(training_data.H_2_grid,5)*size(training_data.H_2_grid,6));                   % reshape H2 coordinates (2023-11-01)
+data.H_three_reshaped = reshape(training_data.H_3_grid,1,size(training_data.H_3_grid,1)*size(training_data.H_3_grid,2)*size(training_data.H_3_grid,3)*size(training_data.H_3_grid,4)*size(training_data.H_3_grid,5)*size(training_data.H_3_grid,6));                 % reshape H3 coordinates (2023-11-01)
+data.H_four_reshaped = reshape(training_data.H_4_grid,1,size(training_data.H_4_grid,1)*size(training_data.H_4_grid,2)*size(training_data.H_4_grid,3)*size(training_data.H_4_grid,4)*size(training_data.H_4_grid,5)*size(training_data.H_4_grid,6));                  % reshape H4 coordinates (2023-11-01)
 
 data.P_mat = [data.SP_input_1_reshaped;data.SP_input_2_reshaped;data.H_one_reshaped;data.H_two_reshaped;data.H_three_reshaped;data.H_four_reshaped]; % create a matrix containing all inputs (2023-11-16)
 
@@ -61,9 +65,7 @@ net.plotFcns = {'plotperform','plottrainstate'}; % plot performance on
 
 %% initialize and train NN
 net = init(net);
-net.trainParam.epochs = 1500;%5000;
-% net.trainParam.max_fail = 100;
-% net.performParam.regularization = 0.9;
+net.trainParam.epochs = 1500;
 [net,tr] = train(net,data.P_mat,data.T_mat);
 
 %% simulate the trained NN
