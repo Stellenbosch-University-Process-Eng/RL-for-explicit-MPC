@@ -7,7 +7,7 @@
 clc;clear;%close all;
 
 %% define valve positions
-param.gamma1 = 0.45;
+param.gamma1 = 0.55;
 param.gamma2 = param.gamma1;
 
 if param.gamma1 < 0.5 % if non-minimum phase region
@@ -26,8 +26,8 @@ param.a3 = param.a1;
 param.a2 = 0.057;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
-param.k1 = 3.14;     % pump 1 gain (cm^3/V)
-param.k2 = 3.29;     % pump 2 gain (cm^3/V)
+param.k1 = 3.33;     % pump 1 gain (cm^3/V)
+param.k2 = 3.33;     % pump 2 gain (cm^3/V)
 
 %% determine initial model steady
 v_1_SS = 3; % pump 1 voltage (V)
@@ -93,7 +93,7 @@ min_pole_locs = pole(sys_min);
 if pos_zero_flag == 1 % if in non-minimum phase region
     zero_to_eval = find(min_zero_locs > 0);
 else
-    zero_to_eval = 1;
+    zero_to_eval = 2;
 end
 
 %% test for controllability
@@ -127,7 +127,7 @@ set(gca,'FontSize',myFontSize,'FontName','Times New Roman');
 yline(0,'k--','LineWidth',2);
 xline(0,'k--','LineWidth',2);
 legend('zero location');
-xlim([0,1.5]);
+xlim([-1,0]);
 ylim([-0.1,0.1]);
 % set(gca, 'XScale', 'log')
 
