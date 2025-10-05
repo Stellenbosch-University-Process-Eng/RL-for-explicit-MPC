@@ -111,6 +111,10 @@ G_s_at_z = [G_s_11(min_zero_locs(zero_to_eval)), G_s_12(min_zero_locs(zero_to_ev
 
 [U,S,V] = svd(G_s_at_z);
 
+G_at_ss = [G_s_11(0), G_s_12(0); G_s_21(0), G_s_22(0)];
+
+[U_G_ss,S_G_ss,V_G_ss] = svd(G_at_ss);
+
 %% figures
 myFontSize = 20;
 myMarkerSize = 20;
