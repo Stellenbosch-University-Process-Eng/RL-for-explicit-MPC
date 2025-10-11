@@ -12,6 +12,8 @@ init_gamma = 0.95;  % initial valve fraction opening
 fin_gamma = 0.55;   % final valve fraction opening
 gamma_vals = linspace(init_gamma,fin_gamma,num_gammas); % valve fractions
 
+step_response_cell = cell(1,num_gammas); % cell array used to store all timeseries data
+
 for cntr = 1:1:num_gammas
 
 param.gamma1 = gamma_vals(cntr);
@@ -87,8 +89,15 @@ Ob = obsv(sys_min.A, sys_min.C);
 isObservable = rank(Ob) == size(sys_min.A,1);
 
 %% find tranmission zeros and poles
-    min_zero_locs(:,cntr) = tzero(sys_min);
-    min_pole_locs(:,cntr) = pole(sys_min);
+min_zero_locs(:,cntr) = tzero(sys_min);
+min_pole_locs(:,cntr) = pole(sys_min);
+
+%% compute step responses
+t = 0:0.01:1000;  % simulation from 0 to 10 seconds with 0.01 s step
+u = [ones(length(t),1), -ones(length(t),1)];
+y = lsim(sys_ss, u, t);  % y will be [length(t) x 2] corresponding to outputs
+
+step_response_cell{cntr} = y; % store step response in two liquid heights corresponding to the current valve position
 
 end % end loop over valve positions
 
@@ -96,13 +105,13 @@ Sorted_min_zero_locs  = sort_rows_smoothest_output(min_zero_locs); % arrange zer
 
 %% figures
 myLabelFontSize = 20;
-myAxisNumberFontSize = 14;
-myMarkerSize = 20;
+myAxisNumberFontSize = 20;
+myMarkerSize = 15;
 myLineWidth = 3;
 
 tls = tiledlayout(1,2,'TileSpacing','compact','Padding','compact');
 
-subplot(1,2,1)
+nexttile
 plot(gamma_vals,Sorted_min_zero_locs(2,:),'k:x','LineWidth',myLineWidth,'MarkerSize',myMarkerSize); hold on;
 hold on;
 plot(gamma_vals,Sorted_min_zero_locs(1,:),'k:o','LineWidth',myLineWidth,'MarkerSize',myMarkerSize); hold on;
@@ -110,6 +119,8 @@ set(gca,'FontSize',myAxisNumberFontSize,'FontName','Times New Roman');
 
 lgnd_1 = legend('z_1','z_2');
 lgnd_1.Location = "best";
+lgnd_1.FontSize = myLabelFontSize;
+
 xlim([0.55,0.95]);
 set(gca,'xdir','reverse'); % show valve positions decreasing
 
@@ -120,20 +131,29 @@ xlbl.FontSize = myLabelFontSize;
 ylbl.FontSize = myLabelFontSize;
 
 % visualise step response of +1 in v1 and -1 in v2
-subplot(1,2,2)
-t = 0:0.01:1000;  % simulation from 0 to 10 seconds with 0.01 s step
-u = [ones(length(t),1), -ones(length(t),1)];
-y = lsim(sys_ss, u, t);  % y will be [length(t) x 2] corresponding to outputs
-plot(t, y(:,1), 'Color',[44,162,95]/255,'LineWidth',myLineWidth); hold on;
-plot(t, y(:,2), 'Color',[43,140,190]/255, 'LineWidth',myLineWidth);
-xlabel('Time (s)');
-ylabel('Scaled liquid height');
+nexttile
+
+for step_plot_cntr = 1:1:num_gammas
+    plot(t,step_response_cell{step_plot_cntr}(:,1),'Color',[44,162,95]/255,'LineWidth',myLineWidth); hold on;
+    plot(t,step_response_cell{step_plot_cntr}(:,2),'Color',[43,140,190]/255,'LineWidth',myLineWidth); hold on;
+
+end % end loop through valve positions
+
+xlbl_2 = xlabel('Time (s)');
+ylbl_2 = ylabel('Scaled liquid height');
 grid on;
-set(gca,'FontSize',myLabelFontSize,'FontName','Times New Roman');
+set(gca,'FontSize',myAxisNumberFontSize,'FontName','Times New Roman');
 set(gcf,'Color','w'); 
 hold on;
 yline(0,'k--','LineWidth',2);
-legend('H_1 (-)','H_2 (-)');
+lgnd_2 = legend('H_1 (-)','H_2 (-)');
+% lgnd_2.Location = "best";
+lgnd_2.FontSize = myLabelFontSize;
+
+grid off;
+
+xlbl_2.FontSize = myLabelFontSize;
+ylbl_2.FontSize = myLabelFontSize;
 
 %% functions
 function M_new = sort_rows_smoothest_output(M_original)
