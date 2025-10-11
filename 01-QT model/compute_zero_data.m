@@ -7,14 +7,15 @@
 clc;clear;%close all;
 
 %% define valve positions
-param.gamma1 = 0.55;
-param.gamma2 = param.gamma1;
+num_gammas = 10;    % number of valve position for which to determine zero locations
+init_gamma = 0.95;  % initial valve fraction opening
+fin_gamma = 0.55;   % final valve fraction opening
+gamma_vals = linspace(init_gamma,fin_gamma,num_gammas); % valve fractions
 
-if param.gamma1 < 0.5 % if non-minimum phase region
-    pos_zero_flag = 1; % flag that index of positive zero must be found
-else
-    pos_zero_flag = 0;
-end
+for cntr = 1:1:num_gammas
+
+param.gamma1 = gamma_vals(cntr);
+param.gamma2 = param.gamma1;
 
 %% define parameters for model
 param.A1 = 28;  % cross-sectional area (cm^2)
@@ -86,76 +87,70 @@ Ob = obsv(sys_min.A, sys_min.C);
 isObservable = rank(Ob) == size(sys_min.A,1);
 
 %% find tranmission zeros and poles
-min_zero_locs = tzero(sys_min);
-min_pole_locs = pole(sys_min);
+    min_zero_locs(:,cntr) = tzero(sys_min);
+    min_pole_locs(:,cntr) = pole(sys_min);
 
-% zero to evaluate
-if pos_zero_flag == 1 % if in non-minimum phase region
-    zero_to_eval = find(min_zero_locs > 0);
-else
-    zero_to_eval = 2;
-end
+end % end loop over valve positions
 
-%% test for controllability
-% Controllability test
-Co = ctrb(sys_min.A, sys_min.B);
-is_controllable = rank(Co) == size(sys_min.A,1);
-
-%% determine input and output directions of the second zero
-G_s_11 = @(x) (lin_param.v1_Fact/lin_param.h1_Fact)*(lin_param.K2/( lin_param.tau_h1*x + 1 ));
-G_s_12 = @(x) (lin_param.v2_Fact/lin_param.h1_Fact)*(lin_param.K1*lin_param.K5)/( (lin_param.tau_h1*x + 1)*(lin_param.tau_h3*x + 1) );
-G_s_21 = @(x) (lin_param.v1_Fact/lin_param.h2_Fact)*(lin_param.K3*lin_param.K6)/( (lin_param.tau_h2*x + 1)*(lin_param.tau_h4*x + 1) );
-G_s_22 = @(x) (lin_param.v2_Fact/lin_param.h2_Fact)*(lin_param.K4/( lin_param.tau_h2*x + 1 ));
-
-G_s_at_z = [G_s_11(min_zero_locs(zero_to_eval)), G_s_12(min_zero_locs(zero_to_eval)); G_s_21(min_zero_locs(zero_to_eval)), G_s_22(min_zero_locs(zero_to_eval))];
-
-[U,S,V] = svd(G_s_at_z);
-
-G_at_ss = [G_s_11(0), G_s_12(0); G_s_21(0), G_s_22(0)];
-
-[U_G_ss,S_G_ss,V_G_ss] = svd(G_at_ss);
+Sorted_min_zero_locs  = sort_rows_smoothest_output(min_zero_locs); % arrange zero positions for the two respective rows
 
 %% figures
-myFontSize = 20;
+myLabelFontSize = 20;
+myAxisNumberFontSize = 14;
 myMarkerSize = 20;
+myLineWidth = 3;
 
-subplot(1,3,1)
-plot(min_zero_locs(zero_to_eval),0,'kx','LineWidth',3,'MarkerSize',myMarkerSize); hold on;
-xlabel('Re (-)'), ylabel('Im (-)');
-set(gca,'FontSize',myFontSize,'FontName','Times New Roman');
-% axis equal
-yline(0,'k--','LineWidth',2);
-xline(0,'k--','LineWidth',2);
-legend('zero location');
-xlim([-1,0]);
-ylim([-0.1,0.1]);
-% set(gca, 'XScale', 'log')
+tls = tiledlayout(1,2,'TileSpacing','compact','Padding','compact');
 
-subplot(1,3,2)
-% add vector direction
-z = [0,0];
-quiver(z(1), z(2), U(1,end), U(2,end), 0, 'LineWidth', 2, 'MaxHeadSize', 0.5,'Color','k'); hold on;
-axis equal
-xlabel('H_1 (-)'), ylabel('H_2 (-)');
-xlim([-1,1]);
-ylim([-1,1]);
-yline(0,'k--','LineWidth',2);
-xline(0,'k--','LineWidth',2);
-set(gca,'FontSize',myFontSize,'FontName','Times New Roman');
-set(gcf,'Color','w');
+subplot(1,2,1)
+plot(gamma_vals,Sorted_min_zero_locs(2,:),'k:x','LineWidth',myLineWidth,'MarkerSize',myMarkerSize); hold on;
+hold on;
+plot(gamma_vals,Sorted_min_zero_locs(1,:),'k:o','LineWidth',myLineWidth,'MarkerSize',myMarkerSize); hold on;
+set(gca,'FontSize',myAxisNumberFontSize,'FontName','Times New Roman');
+
+lgnd_1 = legend('z_1','z_2');
+lgnd_1.Location = "best";
+xlim([0.55,0.95]);
+set(gca,'xdir','reverse'); % show valve positions decreasing
+
+xlbl = xlabel('\gamma (-)'); 
+ylbl = ylabel('z (-)');
+
+xlbl.FontSize = myLabelFontSize;
+ylbl.FontSize = myLabelFontSize;
 
 % visualise step response of +1 in v1 and -1 in v2
-subplot(1,3,3)
+subplot(1,2,2)
 t = 0:0.01:1000;  % simulation from 0 to 10 seconds with 0.01 s step
 u = [ones(length(t),1), -ones(length(t),1)];
 y = lsim(sys_ss, u, t);  % y will be [length(t) x 2] corresponding to outputs
-plot(t, y(:,1), 'Color',[44,162,95]/255,'LineWidth',3); hold on;
-plot(t, y(:,2), 'Color',[43,140,190]/255, 'LineWidth', 3);
+plot(t, y(:,1), 'Color',[44,162,95]/255,'LineWidth',myLineWidth); hold on;
+plot(t, y(:,2), 'Color',[43,140,190]/255, 'LineWidth',myLineWidth);
 xlabel('Time (s)');
 ylabel('Scaled liquid height');
 grid on;
-set(gca,'FontSize',myFontSize,'FontName','Times New Roman');
+set(gca,'FontSize',myLabelFontSize,'FontName','Times New Roman');
 set(gcf,'Color','w'); 
 hold on;
 yline(0,'k--','LineWidth',2);
 legend('H_1 (-)','H_2 (-)');
+
+%% functions
+function M_new = sort_rows_smoothest_output(M_original)
+    M_new = M_original(:,1);
+    for col = 2:1:size(M_original,2)
+        crnt_col = M_original(:,col);
+
+        % compare distances of two possible orders
+        keep_dist = sum(abs(crnt_col - M_new(:,end)));
+        swap_dist = sum(abs(flip(crnt_col) - M_new(:,end)));
+
+        if swap_dist < keep_dist
+            M_new = [M_new,flip(crnt_col)];
+        else
+            M_new = [M_new,crnt_col];
+        end
+
+    end % end loop across columns
+
+end % end index sorting function
