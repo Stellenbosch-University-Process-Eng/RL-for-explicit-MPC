@@ -8,8 +8,8 @@ clc;clear;%close all;
 
 %% define valve positions
 num_gammas = 5;    % number of valve position for which to determine zero locations
-init_gamma = 0.01;  % initial valve fraction opening
-fin_gamma = 0.5;   % final valve fraction opening
+init_gamma = 0.95;  % initial valve fraction opening
+fin_gamma = 0.55;   % final valve fraction opening
 gamma_vals = linspace(init_gamma,fin_gamma,num_gammas); % valve fractions
 
 step_response_cell = cell(1,num_gammas); % cell array used to store all timeseries data
@@ -29,8 +29,8 @@ param.a3 = param.a1;
 param.a2 = 0.057;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
-param.k1 = 3.14;     % pump 1 gain (cm^3/V)
-param.k2 = 3.29;     % pump 2 gain (cm^3/V)
+param.k1 = 3.33;     % pump 1 gain (cm^3/V)
+param.k2 = 3.33;     % pump 2 gain (cm^3/V)
 
 %% determine initial model steady
 v_1_SS = 3; % pump 1 voltage (V)
@@ -121,8 +121,8 @@ lgnd_1 = legend('z_1','z_2');
 lgnd_1.Location = "best";
 lgnd_1.FontSize = myLabelFontSize;
 
-xlim([0.01,0.5]);
-% set(gca,'xdir','reverse'); % show valve positions decreasing
+xlim([0.55,0.95]);
+set(gca,'xdir','reverse'); % show valve positions decreasing
 
 xlbl = xlabel('\gamma (-)'); 
 ylbl = ylabel('z (-)');
