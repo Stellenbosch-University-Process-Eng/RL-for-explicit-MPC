@@ -29,8 +29,8 @@ param.a3 = param.a1;
 param.a2 = 0.057;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
-param.k1 = 3.14;     % pump 1 gain (cm^3/V)
-param.k2 = 3.29;     % pump 2 gain (cm^3/V)
+param.k1 = 3.33;     % pump 1 gain (cm^3/V)
+param.k2 = 3.33;     % pump 2 gain (cm^3/V)
 
 %% determine initial model steady
 v_1_SS = 3; % pump 1 voltage (V)
