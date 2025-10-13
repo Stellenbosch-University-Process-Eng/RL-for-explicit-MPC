@@ -7,7 +7,7 @@
 clc;clear;%close all;
 
 %% define valve positions
-num_gammas = 100;    % number of valve position for which to determine zero locations
+num_gammas = 200;    % number of valve position for which to determine zero locations
 init_gamma = 0.01;  % initial valve fraction opening
 fin_gamma = 0.99;   % final valve fraction opening
 gamma_vals = linspace(init_gamma,fin_gamma,num_gammas); % valve fractions
