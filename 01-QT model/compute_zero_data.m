@@ -22,15 +22,15 @@ param.gamma2 = param.gamma1;
 %% define parameters for model
 param.A1 = 28;  % cross-sectional area (cm^2)
 param.A3 = param.A1; 
-param.A2 = 32;
+param.A2 = 28;
 param.A4 = param.A2;
 param.a1 = 0.071; % cross-section of tank outlet (cm^2)
 param.a3 = param.a1;
-param.a2 = 0.057;
+param.a2 = 0.071;
 param.a4 = param.a2;
 param.g = 981;       % gravitational acceleration (cm/s^2)
-param.k1 = 3.33;     % pump 1 gain (cm^3/V)
-param.k2 = 3.33;     % pump 2 gain (cm^3/V)
+param.k1 = 2;     % pump 1 gain (cm^3/V)
+param.k2 = 2;     % pump 2 gain (cm^3/V)
 
 %% determine initial model steady
 v_1_SS = 3; % pump 1 voltage (V)
