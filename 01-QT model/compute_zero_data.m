@@ -4,7 +4,7 @@
 %% Date: 2025-10-04
 
 %%
-clc;clear;%close all;
+clc; clear; close all;
 
 %% define valve positions
 num_gammas = 200;    % number of valve position for which to determine zero locations
